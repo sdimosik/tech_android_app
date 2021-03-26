@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">Films</string>
+
+    <string name="title_watch">Watch</string>
+    <string name="title_calendar">Calendar</string>
+    <string name="title_feed">Feed</string>
+    <string name="title_history">History</string>
+    <string name="title_profile">Profile</string>
+</resources>
