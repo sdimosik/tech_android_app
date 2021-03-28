@@ -1,4 +1,4 @@
-package android.technopolis.films.ui.calendar
+package android.technopolis.films.viewmodels
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData

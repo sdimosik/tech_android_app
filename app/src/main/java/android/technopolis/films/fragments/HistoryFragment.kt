@@ -1,4 +1,4 @@
-package android.technopolis.films.ui.history
+package android.technopolis.films.fragments
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -9,18 +9,19 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import android.technopolis.films.R
+import android.technopolis.films.viewmodels.HistoryViewModel
 
 class HistoryFragment : Fragment() {
 
     private lateinit var mHistoryViewModel: HistoryViewModel
 
     override fun onCreateView(
-            inflater: LayoutInflater,
-            container: ViewGroup?,
-            savedInstanceState: Bundle?
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
     ): View? {
         mHistoryViewModel =
-                ViewModelProvider(this).get(HistoryViewModel::class.java)
+            ViewModelProvider(this).get(HistoryViewModel::class.java)
         val root = inflater.inflate(R.layout.fragment_history, container, false)
         val textView: TextView = root.findViewById(R.id.text_history)
         mHistoryViewModel.text.observe(viewLifecycleOwner, Observer {

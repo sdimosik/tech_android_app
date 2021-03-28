@@ -1,7 +1,8 @@
-package android.technopolis.films.ui.calendar
+package android.technopolis.films.fragments
 
 import android.os.Bundle
 import android.technopolis.films.R
+import android.technopolis.films.viewmodels.CalendarViewModel
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,12 +15,12 @@ class CalendarFragment : Fragment() {
     private lateinit var mCalendarViewModel: CalendarViewModel
 
     override fun onCreateView(
-            inflater: LayoutInflater,
-            container: ViewGroup?,
-            savedInstanceState: Bundle?
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
     ): View? {
         mCalendarViewModel =
-                ViewModelProvider(this).get(CalendarViewModel::class.java)
+            ViewModelProvider(this).get(CalendarViewModel::class.java)
         val root = inflater.inflate(R.layout.fragment_calendar, container, false)
         val textView: TextView = root.findViewById(R.id.text_calendar)
         mCalendarViewModel.text.observe(viewLifecycleOwner, Observer {

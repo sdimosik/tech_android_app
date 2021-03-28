@@ -1,7 +1,8 @@
-package android.technopolis.films.ui.watch
+package android.technopolis.films.fragments
 
 import android.os.Bundle
 import android.technopolis.films.R
+import android.technopolis.films.viewmodels.WatchViewModel
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,12 +16,12 @@ class WatchFragment : Fragment() {
     private lateinit var mWatchViewModel: WatchViewModel
 
     override fun onCreateView(
-            inflater: LayoutInflater,
-            container: ViewGroup?,
-            savedInstanceState: Bundle?
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
     ): View? {
         mWatchViewModel =
-                ViewModelProvider(this).get(WatchViewModel::class.java)
+            ViewModelProvider(this).get(WatchViewModel::class.java)
         val root = inflater.inflate(R.layout.fragment_watch, container, false)
         val textView: TextView = root.findViewById(R.id.text_watch)
         mWatchViewModel.text.observe(viewLifecycleOwner, Observer {

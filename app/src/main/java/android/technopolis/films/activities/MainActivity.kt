@@ -1,6 +1,7 @@
-package android.technopolis.films
+package android.technopolis.films.activities
 
 import android.os.Bundle
+import android.technopolis.films.R
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
@@ -18,12 +19,15 @@ class MainActivity : AppCompatActivity() {
         val navController = findNavController(R.id.nav_host_fragment)
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
-        val appBarConfiguration = AppBarConfiguration(setOf(
+        val appBarConfiguration = AppBarConfiguration(
+            setOf(
                 R.id.navigation_watch,
                 R.id.navigation_calendar,
                 R.id.navigation_feed,
                 R.id.navigation_history,
-                R.id.navigation_profile))
+                R.id.navigation_profile
+            )
+        )
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
     }

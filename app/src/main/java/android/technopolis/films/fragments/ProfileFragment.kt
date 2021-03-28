@@ -1,4 +1,4 @@
-package android.technopolis.films.ui.profile
+package android.technopolis.films.fragments
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -9,18 +9,19 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import android.technopolis.films.R
+import android.technopolis.films.viewmodels.ProfileViewModel
 
 class ProfileFragment : Fragment() {
 
     private lateinit var mProfileViewModel: ProfileViewModel
 
     override fun onCreateView(
-            inflater: LayoutInflater,
-            container: ViewGroup?,
-            savedInstanceState: Bundle?
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
     ): View? {
         mProfileViewModel =
-                ViewModelProvider(this).get(ProfileViewModel::class.java)
+            ViewModelProvider(this).get(ProfileViewModel::class.java)
         val root = inflater.inflate(R.layout.fragment_profile, container, false)
         val textView: TextView = root.findViewById(R.id.text_profile)
         mProfileViewModel.text.observe(viewLifecycleOwner, Observer {

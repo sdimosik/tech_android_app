@@ -1,5 +1,4 @@
-package android.technopolis.films.ui.feed
-
+package android.technopolis.films.viewmodels
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
