@@ -7,31 +7,31 @@
 
     <fragment
         android:id="@+id/navigation_watch"
-        android:name="android.technopolis.films.ui.watch.WatchFragment"
+        android:name="android.technopolis.films.fragments.WatchFragment"
         android:label="@string/title_watch"
         tools:layout="@layout/fragment_watch" />
 
     <fragment
         android:id="@+id/navigation_calendar"
-        android:name="android.technopolis.films.ui.calendar.CalendarFragment"
+        android:name="android.technopolis.films.fragments.CalendarFragment"
         android:label="@string/title_calendar"
         tools:layout="@layout/fragment_calendar" />
 
     <fragment
         android:id="@+id/navigation_feed"
-        android:name="android.technopolis.films.ui.feed.FeedFragment"
+        android:name="android.technopolis.films.fragments.FeedFragment"
         android:label="@string/title_feed"
         tools:layout="@layout/fragment_feed" />
 
     <fragment
         android:id="@+id/navigation_history"
-        android:name="android.technopolis.films.ui.history.HistoryFragment"
+        android:name="android.technopolis.films.fragments.HistoryFragment"
         android:label="@string/title_history"
         tools:layout="@layout/fragment_history" />
 
     <fragment
         android:id="@+id/navigation_profile"
-        android:name="android.technopolis.films.ui.profile.ProfileFragment"
+        android:name="android.technopolis.films.fragments.ProfileFragment"
         android:label="@string/title_profile"
         tools:layout="@layout/fragment_profile" />
 </navigation>
