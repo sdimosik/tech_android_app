@@ -1,31 +1,50 @@
 package android.technopolis.films.ui.profile
 
 import android.os.Bundle
+import android.technopolis.films.R
+import android.technopolis.films.databinding.FragmentProfileBinding
+import android.technopolis.films.ui.base.MainActivity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
-import android.technopolis.films.R
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 
-class ProfileFragment : Fragment() {
+class ProfileFragment : Fragment(R.layout.fragment_profile) {
 
-    private lateinit var mProfileViewModel: ProfileViewModel
+    private var _binding: FragmentProfileBinding? = null;
+    private val binding get() = _binding!!
+
+    private lateinit var profileViewModel: ProfileViewModel
 
     override fun onCreateView(
-            inflater: LayoutInflater,
-            container: ViewGroup?,
-            savedInstanceState: Bundle?
-    ): View? {
-        mProfileViewModel =
-                ViewModelProvider(this).get(ProfileViewModel::class.java)
-        val root = inflater.inflate(R.layout.fragment_profile, container, false)
-        val textView: TextView = root.findViewById(R.id.text_profile)
-        mProfileViewModel.text.observe(viewLifecycleOwner, Observer {
-            textView.text = it
-        })
-        return root
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        _binding = FragmentProfileBinding.inflate(
+            inflater, container, false
+        )
+
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        profileViewModel = (activity as MainActivity).profileViewModel
+
+        profileViewModel.text
+            .onEach { text ->
+                binding.textProfile.text = text
+            }
+            .launchIn(lifecycleScope)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        _binding = null
     }
 }

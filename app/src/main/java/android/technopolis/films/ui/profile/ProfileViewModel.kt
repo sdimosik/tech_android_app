@@ -1,13 +1,15 @@
 package android.technopolis.films.ui.profile
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
+import android.technopolis.films.repository.MainRepository
 import androidx.lifecycle.ViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 
-class ProfileViewModel : ViewModel() {
+class ProfileViewModel(
+    private val mainRepository: MainRepository
+) : ViewModel() {
 
-    private val mText = MutableLiveData<String>().apply {
-        value = "This is profile Fragment"
-    }
-    val text: LiveData<String> = mText
+    private val _text = MutableStateFlow("This is profile Fragment")
+    val text: StateFlow<String> = _text.asStateFlow()
 }
