@@ -1,4 +1,4 @@
-package android.technopolis.films.viewmodels
+package android.technopolis.films.ui.calendar
 
 import android.technopolis.films.repository.MainRepository
 import androidx.lifecycle.ViewModel
