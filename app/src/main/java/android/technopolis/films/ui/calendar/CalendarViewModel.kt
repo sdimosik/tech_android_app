@@ -1,12 +1,16 @@
 package android.technopolis.films.ui.calendar
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
+import android.technopolis.films.repository.MainRepository
 import androidx.lifecycle.ViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 
-class CalendarViewModel : ViewModel() {
-    private val mText = MutableLiveData<String>().apply {
-        value = "This is calendar Fragment"
-    }
-    val text: LiveData<String> = mText
+class CalendarViewModel(
+    private val mainRepository: MainRepository
+) : ViewModel() {
+
+    private val _text = MutableStateFlow("This is calendar Fragment")
+    val text: StateFlow<String> = _text.asStateFlow()
+
 }
