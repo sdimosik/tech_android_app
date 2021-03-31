@@ -92,6 +92,7 @@ obj/
 .idea/gradle.xml
 .idea/jarRepositories.xml
 .idea/navEditor.xml
+.idea/codeStyles
 
 # OS-specific files
 .DS_Store
