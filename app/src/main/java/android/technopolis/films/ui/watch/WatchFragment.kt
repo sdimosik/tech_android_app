@@ -18,6 +18,7 @@ class WatchFragment : Fragment(R.layout.fragment_watch) {
     private val binding get() = _binding!!
 
     private lateinit var watchViewModel: WatchViewModel
+    private lateinit var rvMediaList: RecyclerView
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -36,11 +37,18 @@ class WatchFragment : Fragment(R.layout.fragment_watch) {
 
         watchViewModel = (activity as MainActivity).watchViewModel
 
-        val rvMediaList: RecyclerView =
-            (activity as MainActivity).findViewById(R.id.media_list_recycler_view)
-        val adapter = MediaAdapter(listOf())
-        rvMediaList.layoutManager = LinearLayoutManager(activity as MainActivity)
+        rvMediaList = binding.root.findViewById(R.id.media_list_recycler_view)
+        val adapter = MediaAdapter(
+            listOf(
+                Media(),
+                Media(),
+                Media(),
+                Media(),
+                Media(),
+            )
+        )
         rvMediaList.adapter = adapter
+        rvMediaList.layoutManager = LinearLayoutManager(binding.root.context)
     }
 
     override fun onDestroy() {
