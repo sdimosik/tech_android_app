@@ -8,9 +8,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.lifecycleScope
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+
 
 class WatchFragment : Fragment(R.layout.fragment_watch) {
 
@@ -36,11 +36,11 @@ class WatchFragment : Fragment(R.layout.fragment_watch) {
 
         watchViewModel = (activity as MainActivity).watchViewModel
 
-        watchViewModel.text
-            .onEach { text ->
-                binding.textWatch.text = text
-            }
-            .launchIn(lifecycleScope)
+        val rvMediaList: RecyclerView =
+            (activity as MainActivity).findViewById(R.id.media_list_recycler_view)
+        val adapter = MediaAdapter(listOf())
+        rvMediaList.layoutManager = LinearLayoutManager(activity as MainActivity)
+        rvMediaList.adapter = adapter
     }
 
     override fun onDestroy() {
