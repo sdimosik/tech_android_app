@@ -2,6 +2,8 @@ package android.technopolis.films.ui.calendar
 
 import android.os.Bundle
 import android.technopolis.films.R
+import android.technopolis.films.ui.base.MainActivity
+import android.technopolis.films.databinding.FragmentCalendarBinding
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,16 +11,23 @@ import android.widget.Button
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import com.michalsvec.singlerowcalendar.calendar.CalendarChangesObserver
 import com.michalsvec.singlerowcalendar.calendar.CalendarViewManager
 import com.michalsvec.singlerowcalendar.calendar.SingleRowCalendar
 import com.michalsvec.singlerowcalendar.calendar.SingleRowCalendarAdapter
 import com.michalsvec.singlerowcalendar.selection.CalendarSelectionManager
 import com.michalsvec.singlerowcalendar.utils.DateUtils
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import java.util.*
 
-class CalendarFragment : Fragment() {
-    private lateinit var mCalendarViewModel: CalendarViewModel
+class CalendarFragment : Fragment(R.layout.fragment_calendar) {
+
+    private var _binding: FragmentCalendarBinding? = null
+    private val binding get() = _binding!!
+
+    private lateinit var calendarViewModel: CalendarViewModel
 
     private val calendar = Calendar.getInstance()
     private var currentMonth = 0
@@ -27,8 +36,13 @@ class CalendarFragment : Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        mCalendarViewModel =
+    ): View {
+
+        _binding = FragmentCalendarBinding.inflate(
+            inflater, container, false
+        )
+
+        calendarViewModel =
             ViewModelProvider(this).get(CalendarViewModel::class.java)
         val root = inflater.inflate(R.layout.fragment_calendar, container, false)
 
@@ -112,7 +126,9 @@ class CalendarFragment : Fragment() {
             singleRowCalendar.setDates(getDatesOfPreviousMonth())
             singleRowCalendar.calendarSelectionManager = mySelectionManager
         }
-        return root
+
+
+        return binding.root
     }
 
     private fun getDatesOfNextMonth(): List<Date> {
@@ -154,5 +170,22 @@ class CalendarFragment : Fragment() {
         }
         calendar.add(Calendar.DATE, -1)
         return list
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        calendarViewModel = (activity as MainActivity).calendarViewModel
+
+        calendarViewModel.text
+            .onEach { text ->
+                binding.textFeed.text = text
+            }
+            .launchIn(lifecycleScope)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        _binding = null
     }
 }
