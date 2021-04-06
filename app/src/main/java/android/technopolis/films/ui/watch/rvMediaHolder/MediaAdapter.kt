@@ -1,4 +1,4 @@
-package android.technopolis.films.ui.watch
+package android.technopolis.films.ui.watch.rvMediaHolder
 
 import android.technopolis.films.R
 import android.view.LayoutInflater
@@ -12,8 +12,8 @@ class MediaAdapter(
     private val _media: List<Media>
 ) : RecyclerView.Adapter<MediaAdapter.MediaViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MediaViewHolder {
-        val view =
-            LayoutInflater.from(parent.context).inflate(R.layout.media_holder, parent, false)
+        val view = LayoutInflater.from(parent.context)
+            .inflate(R.layout.media_holder, parent, false)
         return MediaViewHolder(view)
     }
 
