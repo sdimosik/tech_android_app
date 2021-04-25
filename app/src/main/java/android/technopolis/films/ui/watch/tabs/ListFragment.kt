@@ -14,7 +14,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 
 class ListFragment(var tabType: TabType) : Fragment(R.layout.fragment_list) {
     private var _binding: FragmentListBinding? = null
-    private val binding get() = _binding!!
+    private val binding get() = _binding
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -23,7 +23,7 @@ class ListFragment(var tabType: TabType) : Fragment(R.layout.fragment_list) {
     ): View {
         _binding = FragmentListBinding.inflate(inflater, container, false)
 
-        return binding.root
+        return binding?.root!!
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -33,11 +33,13 @@ class ListFragment(var tabType: TabType) : Fragment(R.layout.fragment_list) {
     }
 
     private fun setupRecyclerView() {
-        with(binding.mediaListRecyclerView) {
-            layoutManager = LinearLayoutManager(activity)
-            setHasFixedSize(true)
-            addItemDecoration(object : DividerItemDecoration(activity, HORIZONTAL) {})
-            adapter = MediaAdapter(fetchData())
+        binding?.let {
+            with(it.mediaListRecyclerView) {
+                layoutManager = LinearLayoutManager(activity)
+                setHasFixedSize(true)
+                addItemDecoration(object : DividerItemDecoration(activity, HORIZONTAL) {})
+                adapter = MediaAdapter(fetchData())
+            }
         }
     }
 

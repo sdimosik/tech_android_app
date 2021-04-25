@@ -6,7 +6,6 @@ import android.technopolis.films.databinding.FragmentWatchBinding
 import android.technopolis.films.repository.Repository
 import android.technopolis.films.ui.common.BaseFragment
 import android.technopolis.films.ui.watch.tabs.WatchTabLayoutAdapter
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
