@@ -1,11 +1,11 @@
 package android.technopolis.films.ui.watch
 
-import android.technopolis.films.repository.MainRepository
+import android.technopolis.films.repository.Repository
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 
 class WatchViewModelFactory(
-    private val mainRepository: MainRepository
+    private val mainRepository: Repository
 ) : ViewModelProvider.Factory {
 
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {

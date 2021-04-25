@@ -4,17 +4,24 @@ import android.os.Bundle
 import android.technopolis.films.R
 import android.technopolis.films.databinding.ActivityMainBinding
 import android.technopolis.films.repository.MainRepository
+import android.technopolis.films.repository.Repository
+import android.technopolis.films.ui.calendar.CalendarFragment
 import android.technopolis.films.ui.calendar.CalendarViewModel
 import android.technopolis.films.ui.calendar.CalendarViewModelFactory
+import android.technopolis.films.ui.feed.FeedFragment
 import android.technopolis.films.ui.feed.FeedViewModel
 import android.technopolis.films.ui.feed.FeedViewModelFactory
+import android.technopolis.films.ui.history.HistoryFragment
 import android.technopolis.films.ui.history.HistoryViewModel
 import android.technopolis.films.ui.history.HistoryViewModelFactory
+import android.technopolis.films.ui.profile.ProfileFragment
 import android.technopolis.films.ui.profile.ProfileViewModel
 import android.technopolis.films.ui.profile.ProfileViewModelFactory
+import android.technopolis.films.ui.watch.WatchFragment
 import android.technopolis.films.ui.watch.WatchViewModel
 import android.technopolis.films.ui.watch.WatchViewModelFactory
 import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
@@ -29,7 +36,15 @@ class MainActivity : AppCompatActivity() {
     lateinit var feedViewModel: FeedViewModel
     lateinit var historyViewModel: HistoryViewModel
     lateinit var profileViewModel: ProfileViewModel
-    lateinit var watchViewModel: WatchViewModel
+
+    private val watchFragment = WatchFragment()
+    private val calendarFragment = CalendarFragment()
+    private val feedFragment = FeedFragment()
+    private val historyFragment = HistoryFragment()
+    private val profileFragment = ProfileFragment()
+
+    val repository: Repository
+        get() = MainRepository()
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -40,6 +55,11 @@ class MainActivity : AppCompatActivity() {
 
         setUpViewModels()
         setUpNavController()
+    }
+
+    private fun showFragment(fragment: Fragment) {
+        supportFragmentManager.beginTransaction()
+            .replace(R.id.nav_host_fragment, fragment).commit()
     }
 
     private fun setUpNavController() {
@@ -56,6 +76,35 @@ class MainActivity : AppCompatActivity() {
         val navController = findNavController(R.id.nav_host_fragment)
         setupActionBarWithNavController(navController, appBarConfiguration)
         binding.navView.setupWithNavController(navController)
+
+        showFragment(FeedFragment())
+        binding.navView.menu.findItem(R.id.navigation_feed).isChecked = true
+
+        binding.navView.setOnNavigationItemSelectedListener { item ->
+            when (item.itemId) {
+                R.id.navigation_watch -> {
+                    showFragment(watchFragment)
+                    true
+                }
+                R.id.navigation_calendar -> {
+                    showFragment(calendarFragment)
+                    true
+                }
+                R.id.navigation_feed -> {
+                    showFragment(feedFragment)
+                    true
+                }
+                R.id.navigation_history -> {
+                    showFragment(historyFragment)
+                    true
+                }
+                R.id.navigation_profile -> {
+                    showFragment(profileFragment)
+                    true
+                }
+                else -> false
+            }
+        }
     }
 
     private fun setUpViewModels() {
@@ -65,7 +114,6 @@ class MainActivity : AppCompatActivity() {
         setUpViewModelFeed(mainRepository)
         setUpViewModelHistory(mainRepository)
         setUpViewModelProfile(mainRepository)
-        setUpViewModelWatch(mainRepository)
     }
 
     private fun setUpViewModelCalendar(mainRepository: MainRepository) {
@@ -118,18 +166,5 @@ class MainActivity : AppCompatActivity() {
             this,
             profileViewModelProviderFactory
         ).get(ProfileViewModel::class.java)
-    }
-
-    private fun setUpViewModelWatch(mainRepository: MainRepository) {
-
-        val watchViewModelProviderFactory =
-            WatchViewModelFactory(
-                mainRepository
-            )
-
-        watchViewModel = ViewModelProvider(
-            this,
-            watchViewModelProviderFactory
-        ).get(WatchViewModel::class.java)
     }
 }
