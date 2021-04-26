@@ -4,25 +4,17 @@ import android.os.Bundle
 import android.technopolis.films.R
 import android.technopolis.films.databinding.ActivityMainBinding
 import android.technopolis.films.repository.MainRepository
-import android.technopolis.films.repository.Repository
-import android.technopolis.films.ui.calendar.CalendarFragment
 import android.technopolis.films.ui.calendar.CalendarViewModel
 import android.technopolis.films.ui.calendar.CalendarViewModelFactory
-import android.technopolis.films.ui.feed.FeedFragment
 import android.technopolis.films.ui.feed.FeedViewModel
 import android.technopolis.films.ui.feed.FeedViewModelFactory
-import android.technopolis.films.ui.history.HistoryFragment
 import android.technopolis.films.ui.history.HistoryViewModel
 import android.technopolis.films.ui.history.HistoryViewModelFactory
-import android.technopolis.films.ui.profile.ProfileFragment
 import android.technopolis.films.ui.profile.ProfileViewModel
 import android.technopolis.films.ui.profile.ProfileViewModelFactory
-import android.technopolis.films.ui.watch.WatchFragment
-import android.technopolis.films.ui.watch.WatchViewModel
-import android.technopolis.films.ui.watch.WatchViewModelFactory
 import androidx.appcompat.app.AppCompatActivity
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.NavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
@@ -37,17 +29,16 @@ class MainActivity : AppCompatActivity() {
     lateinit var historyViewModel: HistoryViewModel
     lateinit var profileViewModel: ProfileViewModel
 
-    private val watchFragment = WatchFragment()
-    private val calendarFragment = CalendarFragment()
-    private val feedFragment = FeedFragment()
-    private val historyFragment = HistoryFragment()
-    private val profileFragment = ProfileFragment()
-
-    val repository: Repository
-        get() = MainRepository()
+    private lateinit var navController: NavController
+    private val destinations =  setOf(
+        R.id.navigation_watch,
+        R.id.navigation_calendar,
+        R.id.navigation_feed,
+        R.id.navigation_history,
+        R.id.navigation_profile
+    )
 
     override fun onCreate(savedInstanceState: Bundle?) {
-
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
 
@@ -57,49 +48,39 @@ class MainActivity : AppCompatActivity() {
         setUpNavController()
     }
 
-    private fun showFragment(fragment: Fragment) {
-        supportFragmentManager.beginTransaction()
-            .replace(R.id.nav_host_fragment, fragment).commit()
+    private fun navigateTo(id: Int) {
+        navController.navigate(id)
     }
 
     private fun setUpNavController() {
-        val appBarConfiguration = AppBarConfiguration(
-            setOf(
-                R.id.navigation_watch,
-                R.id.navigation_calendar,
-                R.id.navigation_feed,
-                R.id.navigation_history,
-                R.id.navigation_profile
-            )
-        )
+        val appBarConfiguration = AppBarConfiguration(destinations)
 
-        val navController = findNavController(R.id.nav_host_fragment)
+        navController = findNavController(R.id.nav_host_fragment)
         setupActionBarWithNavController(navController, appBarConfiguration)
         binding.navView.setupWithNavController(navController)
 
-        showFragment(FeedFragment())
         binding.navView.menu.findItem(R.id.navigation_feed).isChecked = true
 
         binding.navView.setOnNavigationItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.navigation_watch -> {
-                    showFragment(watchFragment)
+                    navigateTo(R.id.navigation_watch)
                     true
                 }
                 R.id.navigation_calendar -> {
-                    showFragment(calendarFragment)
+                    navigateTo(R.id.navigation_calendar)
                     true
                 }
                 R.id.navigation_feed -> {
-                    showFragment(feedFragment)
+                    navigateTo(R.id.navigation_feed)
                     true
                 }
                 R.id.navigation_history -> {
-                    showFragment(historyFragment)
+                    navigateTo(R.id.navigation_history)
                     true
                 }
                 R.id.navigation_profile -> {
-                    showFragment(profileFragment)
+                    navigateTo(R.id.navigation_profile)
                     true
                 }
                 else -> false
