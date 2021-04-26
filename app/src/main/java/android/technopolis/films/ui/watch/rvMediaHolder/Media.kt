@@ -1,5 +1,6 @@
 package android.technopolis.films.ui.watch.rvMediaHolder
 
-class Media {
-
+data class Media(
+    val id: Int
+) {
 }

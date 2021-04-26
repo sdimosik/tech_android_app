@@ -45,13 +45,13 @@ class ListFragment(var tabType: TabType) : Fragment(R.layout.fragment_list) {
 
     private fun fetchData(): List<Media> {
         return listOf(
-            Media(),
-            Media(),
-            Media(),
-            Media(),
-            Media(),
-            Media(),
-            Media(),
+            Media(1),
+            Media(1),
+            Media(1),
+            Media(1),
+            Media(1),
+            Media(1),
+            Media(1),
         )
     }
 
