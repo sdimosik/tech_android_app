@@ -30,7 +30,7 @@ class MainActivity : AppCompatActivity() {
     lateinit var profileViewModel: ProfileViewModel
 
     private lateinit var navController: NavController
-    private val destinations =  setOf(
+    private val destinations = setOf(
         R.id.navigation_watch,
         R.id.navigation_calendar,
         R.id.navigation_feed,
@@ -48,44 +48,12 @@ class MainActivity : AppCompatActivity() {
         setUpNavController()
     }
 
-    private fun navigateTo(id: Int) {
-        navController.navigate(id)
-    }
-
     private fun setUpNavController() {
         val appBarConfiguration = AppBarConfiguration(destinations)
 
         navController = findNavController(R.id.nav_host_fragment)
         setupActionBarWithNavController(navController, appBarConfiguration)
         binding.navView.setupWithNavController(navController)
-
-        binding.navView.menu.findItem(R.id.navigation_feed).isChecked = true
-
-        binding.navView.setOnNavigationItemSelectedListener { item ->
-            when (item.itemId) {
-                R.id.navigation_watch -> {
-                    navigateTo(R.id.navigation_watch)
-                    true
-                }
-                R.id.navigation_calendar -> {
-                    navigateTo(R.id.navigation_calendar)
-                    true
-                }
-                R.id.navigation_feed -> {
-                    navigateTo(R.id.navigation_feed)
-                    true
-                }
-                R.id.navigation_history -> {
-                    navigateTo(R.id.navigation_history)
-                    true
-                }
-                R.id.navigation_profile -> {
-                    navigateTo(R.id.navigation_profile)
-                    true
-                }
-                else -> false
-            }
-        }
     }
 
     private fun setUpViewModels() {

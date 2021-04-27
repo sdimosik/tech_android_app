@@ -10,7 +10,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 
-class MediaAdapter : ListAdapter<Media, MediaViewHolder>(MediaDiff){
+class MediaAdapter : ListAdapter<Media, MediaViewHolder>(MediaDiff) {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MediaViewHolder {
         val view = LayoutInflater.from(parent.context)
             .inflate(R.layout.media_holder, parent, false)
@@ -35,7 +35,7 @@ class MediaViewHolder(itemView: View) : ViewHolder(itemView) {
     }
 }
 
-object MediaDiff: DiffUtil.ItemCallback<Media>() {
+object MediaDiff : DiffUtil.ItemCallback<Media>() {
     override fun areItemsTheSame(oldItem: Media, newItem: Media): Boolean {
         return false
         TODO("Not yet implemented")

@@ -14,7 +14,7 @@ import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 
-class ListFragment(private val tabType: TabType) : Fragment(R.layout.fragment_list) {
+class ListFragment(private val tabType: TabType) : Fragment() {
     private var binding: FragmentListBinding? = null
 
     private val viewModel: WatchViewModel by activityViewModels()

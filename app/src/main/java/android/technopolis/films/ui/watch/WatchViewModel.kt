@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
-class WatchViewModel: ViewModel() {
+class WatchViewModel : ViewModel() {
     private var _tabArgs = Bundle()
     val tabArgs get() = _tabArgs
 
