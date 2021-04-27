@@ -36,8 +36,8 @@ class ListFragment(private val tabType: TabType) : Fragment(R.layout.fragment_li
         super.onViewCreated(view, savedInstanceState)
 
         setupRecyclerView()
-        binding?.mediaListRecyclerView!!.offsetChildrenVertical(
-            viewModel.tabArgs.getInt(ARGS_TAG, 0)
+        binding?.mediaListRecyclerView?.layoutManager?.onRestoreInstanceState(
+            viewModel.tabArgs.getParcelable(ARGS_TAG)
         )
     }
 
@@ -62,9 +62,9 @@ class ListFragment(private val tabType: TabType) : Fragment(R.layout.fragment_li
     override fun onDestroyView() {
         super.onDestroyView()
 
-        viewModel.tabArgs.putInt(
+        viewModel.tabArgs.putParcelable(
             ARGS_TAG,
-            binding?.mediaListRecyclerView!!.computeVerticalScrollOffset()
+            binding?.mediaListRecyclerView?.layoutManager?.onSaveInstanceState()
         )
 
         binding = null
