@@ -9,7 +9,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -17,10 +17,10 @@ import androidx.recyclerview.widget.LinearLayoutManager
 class ListFragment(private val tabType: TabType) : Fragment(R.layout.fragment_list) {
     private var binding: FragmentListBinding? = null
 
-    private val viewModel: WatchViewModel by viewModels()
+    private val viewModel: WatchViewModel by activityViewModels()
 
     private lateinit var listAdapter: MediaAdapter
-    private var ARGS_TAG  = "${tabType}_SCROLL_OFFSET"
+    private var ARGS_TAG = "${tabType}_SCROLL_OFFSET"
 
     override fun onCreateView(
         inflater: LayoutInflater,

@@ -7,14 +7,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.activityViewModels
 import androidx.viewpager.widget.ViewPager
 import com.google.android.material.tabs.TabLayout
 
 class WatchFragment : Fragment() {
     private var binding: FragmentWatchBinding? = null
 
-    private val watchViewModel: WatchViewModel by viewModels()
+    private val watchViewModel: WatchViewModel by activityViewModels()
 
     private lateinit var tabLayout: TabLayout
     private lateinit var viewPager: ViewPager
