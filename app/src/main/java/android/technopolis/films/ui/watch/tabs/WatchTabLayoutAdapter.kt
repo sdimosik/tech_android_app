@@ -1,5 +1,6 @@
 package android.technopolis.films.ui.watch.tabs
 
+import android.os.Bundle
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
@@ -13,8 +14,8 @@ class WatchTabLayoutAdapter(
 
     override fun getItem(position: Int): Fragment {
         return when (position) {
-            0 -> ListFragment(TabType.FILM)
-            else -> ListFragment(TabType.SHOW)
+            0 -> ListFragment.newInstance(TabType.FILM)
+            else -> ListFragment.newInstance(TabType.SHOW)
         }
     }
 
