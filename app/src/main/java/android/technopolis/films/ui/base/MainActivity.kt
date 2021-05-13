@@ -12,10 +12,9 @@ import android.technopolis.films.ui.history.HistoryViewModel
 import android.technopolis.films.ui.history.HistoryViewModelFactory
 import android.technopolis.films.ui.profile.ProfileViewModel
 import android.technopolis.films.ui.profile.ProfileViewModelFactory
-import android.technopolis.films.ui.watch.WatchViewModel
-import android.technopolis.films.ui.watch.WatchViewModelFactory
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.NavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
@@ -29,10 +28,17 @@ class MainActivity : AppCompatActivity() {
     lateinit var feedViewModel: FeedViewModel
     lateinit var historyViewModel: HistoryViewModel
     lateinit var profileViewModel: ProfileViewModel
-    lateinit var watchViewModel: WatchViewModel
+
+    private lateinit var navController: NavController
+    private val destinations = setOf(
+        R.id.navigation_watch,
+        R.id.navigation_calendar,
+        R.id.navigation_feed,
+        R.id.navigation_history,
+        R.id.navigation_profile
+    )
 
     override fun onCreate(savedInstanceState: Bundle?) {
-
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
 
@@ -43,17 +49,9 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setUpNavController() {
-        val appBarConfiguration = AppBarConfiguration(
-            setOf(
-                R.id.navigation_watch,
-                R.id.navigation_calendar,
-                R.id.navigation_feed,
-                R.id.navigation_history,
-                R.id.navigation_profile
-            )
-        )
+        val appBarConfiguration = AppBarConfiguration(destinations)
 
-        val navController = findNavController(R.id.nav_host_fragment)
+        navController = findNavController(R.id.nav_host_fragment)
         setupActionBarWithNavController(navController, appBarConfiguration)
         binding.navView.setupWithNavController(navController)
     }
@@ -65,7 +63,6 @@ class MainActivity : AppCompatActivity() {
         setUpViewModelFeed(mainRepository)
         setUpViewModelHistory(mainRepository)
         setUpViewModelProfile(mainRepository)
-        setUpViewModelWatch(mainRepository)
     }
 
     private fun setUpViewModelCalendar(mainRepository: MainRepository) {
@@ -118,18 +115,5 @@ class MainActivity : AppCompatActivity() {
             this,
             profileViewModelProviderFactory
         ).get(ProfileViewModel::class.java)
-    }
-
-    private fun setUpViewModelWatch(mainRepository: MainRepository) {
-
-        val watchViewModelProviderFactory =
-            WatchViewModelFactory(
-                mainRepository
-            )
-
-        watchViewModel = ViewModelProvider(
-            this,
-            watchViewModelProviderFactory
-        ).get(WatchViewModel::class.java)
     }
 }

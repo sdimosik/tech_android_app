@@ -1,50 +1,61 @@
 package android.technopolis.films.ui.watch
 
+import android.os.Build
 import android.os.Bundle
-import android.technopolis.films.R
 import android.technopolis.films.databinding.FragmentWatchBinding
-import android.technopolis.films.ui.base.MainActivity
+import android.technopolis.films.ui.watch.tabs.WatchTabLayoutAdapter
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.lifecycleScope
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
+import androidx.fragment.app.activityViewModels
 
-class WatchFragment : Fragment(R.layout.fragment_watch) {
+class WatchFragment : Fragment() {
+    private var binding: FragmentWatchBinding? = null
 
-    private var _binding: FragmentWatchBinding? = null
-    private val binding get() = _binding!!
-
-    private lateinit var watchViewModel: WatchViewModel
+    private val watchViewModel: WatchViewModel by activityViewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentWatchBinding.inflate(
-            inflater, container, false
-        )
-
-        return binding.root
+        binding = FragmentWatchBinding.inflate(inflater, container, false)
+        return binding!!.root
     }
 
+    @RequiresApi(Build.VERSION_CODES.M)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        watchViewModel = (activity as MainActivity).watchViewModel
+        val adapter = WatchTabLayoutAdapter(childFragmentManager, 0)
 
-        watchViewModel.text
-            .onEach { text ->
-                binding.textWatch.text = text
-            }
-            .launchIn(lifecycleScope)
+        val viewPager = binding?.fragmentWatchViewPager!!
+
+        viewPager.adapter = adapter
+        viewPager.currentItem = (watchViewModel.getTabProperty(ARGS_TAG) ?: 0) as Int
+
+        viewPager.setOnScrollChangeListener(View.OnScrollChangeListener(onScrollChangeListener))
+
+        val tabLayout = binding?.fragmentWatchTabLayout!!
+        tabLayout.setupWithViewPager(viewPager)
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        _binding = null
+    private val onScrollChangeListener: (View, Int, Int, Int, Int) -> Unit = { _, _, _, _, _ ->
+        val viewPager = binding?.fragmentWatchViewPager!!
+        val state = Bundle()
+        state.putInt(ARGS_TAG, viewPager.currentItem)
+
+        watchViewModel.onPageChanged(state)
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        binding = null
+    }
+
+    companion object {
+        const val ARGS_TAG = "CURRENT_ITEM"
     }
 }
