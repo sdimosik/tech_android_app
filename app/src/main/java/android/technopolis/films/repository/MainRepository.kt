@@ -1,6 +1,6 @@
 package android.technopolis.films.repository
 
-class MainRepository {
+class MainRepository : Repository {
     init {
 
     }

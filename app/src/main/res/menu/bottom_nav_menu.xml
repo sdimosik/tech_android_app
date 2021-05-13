@@ -2,27 +2,27 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
-        android:id="@+id/navigation_watch"
+        android:id="@id/navigation_watch"
         android:icon="@drawable/ic_watch_black_24dp"
         android:title="@string/title_watch" />
 
     <item
-        android:id="@+id/navigation_calendar"
+        android:id="@id/navigation_calendar"
         android:icon="@drawable/ic_calendar_black_24dp"
         android:title="@string/title_calendar" />
 
     <item
-        android:id="@+id/navigation_feed"
+        android:id="@id/navigation_feed"
         android:icon="@drawable/ic_feed_black_24dp"
         android:title="@string/title_feed" />
 
     <item
-        android:id="@+id/navigation_history"
+        android:id="@id/navigation_history"
         android:icon="@drawable/ic_history_black_24dp"
         android:title="@string/title_history" />
 
     <item
-        android:id="@+id/navigation_profile"
+        android:id="@id/navigation_profile"
         android:icon="@drawable/ic_profile_black_24dp"
         android:title="@string/title_profile" />
 
