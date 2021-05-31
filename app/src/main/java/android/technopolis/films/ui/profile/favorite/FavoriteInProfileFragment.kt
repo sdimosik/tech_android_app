@@ -1,31 +1,32 @@
 package android.technopolis.films.ui.profile.favorite
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
+import android.technopolis.films.R
+import android.technopolis.films.databinding.FragmentFavoriteInProfileBinding
+import android.technopolis.films.ui.profile.ProfileViewModel
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.technopolis.films.R
-import android.technopolis.films.databinding.FragmentFavoriteInProfileBinding
 import android.widget.LinearLayout
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
+import kotlinx.coroutines.launch
 
 class FavoriteInProfileFragment : Fragment(R.layout.fragment_favorite_in_profile) {
 
-    private var _binding: FragmentFavoriteInProfileBinding? = null;
-    private val binding get() = _binding!!
-    private lateinit var filmsAdapter: FavoriteInProfileAdapter
+    private var binding: FragmentFavoriteInProfileBinding? = null
+    private val filmsAdapter: FavoriteInProfileAdapter by lazy { FavoriteInProfileAdapter() }
+    private val profileViewModel: ProfileViewModel by activityViewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentFavoriteInProfileBinding.inflate(
-            inflater, container, false
-        )
-
-        return binding.root
+        binding = FragmentFavoriteInProfileBinding.inflate(inflater, container, false)
+        return binding!!.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -35,9 +36,7 @@ class FavoriteInProfileFragment : Fragment(R.layout.fragment_favorite_in_profile
     }
 
     private fun setUpRecyclerView() {
-        filmsAdapter = FavoriteInProfileAdapter()
-
-        binding.favoriteRv.apply {
+        binding?.favoriteRv?.apply {
             layoutManager = LinearLayoutManager(activity)
             setHasFixedSize(true)
             addItemDecoration(object :
@@ -49,31 +48,16 @@ class FavoriteInProfileFragment : Fragment(R.layout.fragment_favorite_in_profile
     }
 
     private fun fetchingData() {
-        val list: List<FavoriteInProfileItemModel> = listOf(
-            FavoriteInProfileItemModel(1),
-            FavoriteInProfileItemModel(2),
-            FavoriteInProfileItemModel(3),
-            FavoriteInProfileItemModel(4),
-            FavoriteInProfileItemModel(5),
-            FavoriteInProfileItemModel(6),
-            FavoriteInProfileItemModel(7),
-            FavoriteInProfileItemModel(8),
-            FavoriteInProfileItemModel(9),
-            FavoriteInProfileItemModel(10),
-            FavoriteInProfileItemModel(11),
-            FavoriteInProfileItemModel(12),
-            FavoriteInProfileItemModel(13),
-            FavoriteInProfileItemModel(14),
-            FavoriteInProfileItemModel(15),
-            FavoriteInProfileItemModel(16),
-            FavoriteInProfileItemModel(17),
-            FavoriteInProfileItemModel(18))
-
-        filmsAdapter.differ.submitList(list)
+        lifecycleScope.launch {
+            val list = profileViewModel.observeFavoriteList()
+            list.also {
+                filmsAdapter.differ.submitList(list.value)
+            }
+        }
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        _binding = null
+    override fun onDestroyView() {
+        super.onDestroyView()
+        binding = null
     }
 }

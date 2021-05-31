@@ -10,59 +10,76 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
+import androidx.fragment.app.FragmentPagerAdapter
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
-import com.ogaclejapan.smarttablayout.utils.v4.FragmentPagerItemAdapter
-import com.ogaclejapan.smarttablayout.utils.v4.FragmentPagerItems
+import androidx.viewpager2.adapter.FragmentStateAdapter
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 
 class ProfileFragment : Fragment(R.layout.fragment_profile) {
 
-    private var _binding: FragmentProfileBinding? = null;
-    private val binding get() = _binding!!
+    private var binding: FragmentProfileBinding? = null
 
-    private lateinit var profileViewModel: ProfileViewModel
+    private val profileViewModel: ProfileViewModel by activityViewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentProfileBinding.inflate(
-            inflater, container, false
-        )
-
-        return binding.root
+        binding = FragmentProfileBinding.inflate(inflater, container, false)
+        return binding!!.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        profileViewModel = (activity as MainActivity).profileViewModel
+        val adapter = ViewPagerAdapter(childFragmentManager, 0)
+        val viewPager = binding?.viewPager!!
+        viewPager.adapter = adapter
 
-/*        profileViewModel.text
-            .onEach { text ->
-                binding.textProfile.text = text
+        val tabLayout = binding?.fragmentProfileTabLayout!!
+        tabLayout.setupWithViewPager(viewPager)
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        binding = null
+    }
+
+    class ViewPagerAdapter(
+        fm: FragmentManager,
+        behavior: Int
+    ) : FragmentPagerAdapter(fm, behavior) {
+
+        override fun getItem(position: Int): Fragment {
+            return when (position) {
+                0 -> FavoriteInProfileFragment()
+                else -> InfoInProfileFragment()
             }
-            .launchIn(lifecycleScope)*/
-        setUpTabBar()
+        }
+
+        override fun getPageTitle(position: Int): CharSequence {
+            return when (position) {
+                0 -> "FAVORITE"
+                else -> "INFO"
+            }
+        }
+
+        override fun getCount(): Int {
+            return INFO_TITLES.size
+        }
     }
 
-    private fun setUpTabBar() {
-        val adapter = FragmentPagerItemAdapter(
-            childFragmentManager,
-            FragmentPagerItems.with(activity)
-                .add("Favorites", FavoriteInProfileFragment::class.java)
-                .add("Info", InfoInProfileFragment::class.java)
-                .create()
+    companion object {
+        private val INFO_TITLES = arrayOf(
+            R.layout.fragment_favorite_in_profile,
+            R.layout.fragment_info_in_profile
         )
-
-        binding.viewPager.adapter = adapter
-        binding.viewPagerTab.setViewPager(binding.viewPager)
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        _binding = null
     }
 }
