@@ -49,10 +49,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setUpNavController() {
-        val appBarConfiguration = AppBarConfiguration(destinations)
-
         navController = findNavController(R.id.nav_host_fragment)
-        setupActionBarWithNavController(navController, appBarConfiguration)
         binding.navView.setupWithNavController(navController)
     }
 
