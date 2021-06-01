@@ -2,6 +2,8 @@ package android.technopolis.films.ui.base
 
 import android.os.Bundle
 import android.technopolis.films.R
+import android.technopolis.films.api.ApiConfig
+import android.technopolis.films.api.TraktClientGenerator
 import android.technopolis.films.databinding.ActivityMainBinding
 import android.technopolis.films.repository.MainRepository
 import android.technopolis.films.ui.calendar.CalendarViewModel
@@ -40,6 +42,22 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        try {
+            TraktClientGenerator.preferences =
+                getSharedPreferences(TRAKT_API_PREFERENCES, MODE_PRIVATE)
+        } catch (ex: ExceptionInInitializerError) {
+            println(ex)
+            //do login
+            val loginUrl = TraktClientGenerator.loginUrl
+            //redirect user on this login url, obtain code
+            val code = ""//todo
+            TraktClientGenerator.doLogin(code)
+            while (true) {
+                if (ApiConfig.token != null) {
+                    break
+                }
+            }
+        }
         binding = ActivityMainBinding.inflate(layoutInflater)
 
         setContentView(binding.root)
@@ -115,5 +133,9 @@ class MainActivity : AppCompatActivity() {
             this,
             profileViewModelProviderFactory
         ).get(ProfileViewModel::class.java)
+    }
+
+    companion object {
+        private const val TRAKT_API_PREFERENCES = "trakt_api_preferences"
     }
 }

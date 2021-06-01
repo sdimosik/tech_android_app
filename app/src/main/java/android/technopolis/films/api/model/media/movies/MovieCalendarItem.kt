@@ -5,6 +5,6 @@ import java.time.LocalDate
 
 @Serializable
 data class MovieCalendarItem(
-    val released: LocalDate,
+    val released: String, //LocalDate,
     val movie: Movie
 )

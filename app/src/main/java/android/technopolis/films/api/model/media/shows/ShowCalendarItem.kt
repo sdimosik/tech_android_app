@@ -7,7 +7,7 @@ import java.time.LocalDate
 @Serializable
 data class ShowCalendarItem(
     @SerialName("first_aired")
-    val firstAired: LocalDate,
+    val firstAired: String, //LocalDate,
     val episode: Episode,
     val show: Show
 )

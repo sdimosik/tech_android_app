@@ -10,7 +10,7 @@ import java.time.LocalDateTime
 data class WatchListItem(
     val rank: Int,
     @SerialName("listed_at")
-    val listedAt: LocalDateTime,
+    val listedAt: String, //LocalDateTime,
     override val type: MediaType,
     override val movie: Movie? = null,
     override val show: Show? = null,
