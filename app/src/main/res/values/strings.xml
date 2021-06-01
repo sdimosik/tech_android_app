@@ -9,4 +9,8 @@
 
     <string name="watch__tab_layout__film_tab_name">Films</string>
     <string name="watch__tab_layout__show_tab_name">Shows</string>
+
+    <!-- FeedFragment -->
+    <string name="feed_name_item">Name</string>
+    <string name="feed_someInfo_item">SomeInfo</string>
 </resources>
