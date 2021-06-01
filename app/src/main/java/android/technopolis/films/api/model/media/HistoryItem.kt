@@ -10,7 +10,7 @@ import java.time.LocalDateTime
 data class HistoryItem(
     val id: Long,
     @SerialName("watched_at")
-    val watchedAt: LocalDateTime,
+    val watchedAt: String, //LocalDateTime
     val action: String,
     override val type: MediaType,
     override val movie: Movie? = null,

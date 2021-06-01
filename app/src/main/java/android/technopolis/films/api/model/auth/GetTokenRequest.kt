@@ -11,7 +11,7 @@ data class GetTokenRequest(
     @SerialName("client_secret")
     val clientSecret: String,
     @SerialName("redirect_uri")
-    val redirectUri: String = "urn:ietf:wg:oauth:2.0:oob",
+    val redirectUri: String,
     @SerialName("grant_type")
-    val grantType: String = "authorization_code"
+    val grantType: String
 )
