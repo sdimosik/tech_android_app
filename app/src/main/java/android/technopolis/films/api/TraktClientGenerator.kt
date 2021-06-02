@@ -1,22 +1,23 @@
 package android.technopolis.films.api
 
 import android.content.SharedPreferences
+import android.technopolis.films.api.model.auth.GetNewTokenRequest
 import android.technopolis.films.api.model.auth.GetTokenRequest
 import android.technopolis.films.api.model.auth.GetTokenResponse
+import androidx.core.os.trace
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import okhttp3.logging.HttpLoggingInterceptor
 import okhttp3.MediaType
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
+import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
-import retrofit2.await
-import retrofit2.awaitResponse
 
 /**
  * All this must be done before creating the MainRepository!
@@ -58,14 +59,15 @@ class TraktClientGenerator {
                     .addInterceptor { chain ->
                         val request = chain.request()
                             .newBuilder()
-                            .addHeader("Authorization", "Bearer " + ApiConfig.token?.accessToken)
+                            .addHeader("Authorization",
+                                ApiConfig.token?.tokenType + " " + ApiConfig.token?.accessToken)
                             .addHeader("Content-type", contentType.toString())
                             .addHeader("trakt-api-version", "2")
                             .addHeader("trakt-api-key", ApiConfig.clientId)
                             .build()
                         chain.proceed(request)
                     }
-                    .addInterceptor(logging)
+                    .addNetworkInterceptor(logging)
                     .build()
 
                 return Retrofit.Builder()
@@ -77,10 +79,6 @@ class TraktClientGenerator {
 
         private val traktClient: TraktClient by lazy {
             api.create(TraktClient::class.java)
-        }
-
-        private val traktAuthClient: TraktAuthClient by lazy {
-            api.create(TraktAuthClient::class.java)
         }
 
         private fun restoreToken(): GetTokenResponse? {
@@ -98,7 +96,7 @@ class TraktClientGenerator {
             return null
         }
 
-        fun saveToken(token: GetTokenResponse) {
+        private fun saveToken(token: GetTokenResponse) {
             val edit = preferences?.edit()
             val tokenInString = Json.encodeToString(token)
             edit?.putString(TOKEN_NAME, tokenInString)
@@ -114,11 +112,11 @@ class TraktClientGenerator {
                 ApiConfig.clientId,
                 ApiConfig.clientSecret,
                 ApiConfig.redirectUrl,
-                "authorization_code"
+                AUTHORIZATION_CODE
             )
 
-            val launch = GlobalScope.launch(Dispatchers.IO) {
-                val token = traktAuthClient.getToken(request).execute()
+            GlobalScope.launch(Dispatchers.IO) {
+                val token = traktClient.getToken(request)
                 if (token.isSuccessful) {
                     ApiConfig.token = token.body()
                     saveToken(ApiConfig.token!!)
@@ -126,10 +124,29 @@ class TraktClientGenerator {
             }
         }
 
+        fun updateToken() {
+            val request = GetNewTokenRequest(
+                ApiConfig.token!!.refreshToken,
+                ApiConfig.clientId,
+                ApiConfig.clientSecret,
+                ApiConfig.redirectUrl,
+                REFRESH_TOKEN
+            )
+            runBlocking(Dispatchers.IO) {
+                val token = traktClient.getNewToken(request)
+                if (token.isSuccessful) {
+                    ApiConfig.token = token.body()
+                    saveToken(ApiConfig.token!!)
+                }
+            }
+        }
+
+
         fun getClient(): Trakt {
             if (!hasLogin()) {
                 throw ExceptionInInitializerError("User is not logged in")
             }
+
             return Trakt(traktClient)
         }
 
@@ -143,6 +160,9 @@ class TraktClientGenerator {
 
         val loginUrl = String.format(ApiConfig.loginUrl, ApiConfig.clientId, ApiConfig.redirectUrl)
 
-        const val TOKEN_NAME = "trakt_token"
+        private const val TOKEN_NAME = "trakt_token"
+        private const val AUTHORIZATION_CODE = "authorization_code"
+        private const val REFRESH_TOKEN = "refresh_token"
+
     }
 }

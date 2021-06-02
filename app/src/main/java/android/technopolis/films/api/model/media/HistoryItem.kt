@@ -12,7 +12,7 @@ data class HistoryItem(
     @SerialName("watched_at")
     val watchedAt: String, //LocalDateTime
     val action: String,
-    override val type: MediaType,
+    override val type: String,
     override val movie: Movie? = null,
     override val show: Show? = null
 ) : Media

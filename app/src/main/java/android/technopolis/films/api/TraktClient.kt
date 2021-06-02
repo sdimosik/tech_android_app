@@ -1,56 +1,88 @@
 package android.technopolis.films.api
 
 import android.technopolis.films.api.model.auth.GetNewTokenRequest
+import android.technopolis.films.api.model.auth.GetTokenRequest
 import android.technopolis.films.api.model.auth.GetTokenResponse
 import android.technopolis.films.api.model.media.CalendarItem
 import android.technopolis.films.api.model.media.HistoryItem
 import android.technopolis.films.api.model.media.RecommendationItem
 import android.technopolis.films.api.model.media.WatchListItem
 import android.technopolis.films.api.model.stats.UserStats
-import retrofit2.Call
+import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Path
-import java.time.LocalDate
+import retrofit2.http.Query
 
 interface TraktClient {
+    /**
+     * Needed to get access_token and refresh_token from code
+     */
+    @POST("/oauth/token")
+    suspend fun getToken(@Body request: GetTokenRequest): Response<GetTokenResponse>
+
     /**
      * Needed to get new access_token from refresh_token
      */
     @POST("/oauth/token")
-    fun getNewToken(@Body request: GetNewTokenRequest): Call<GetTokenResponse>
-
-    @GET("/recommendations/{type}")
-    fun getRecommendations(
-        @Path("type") mediaType: String,
-    ): Call<List<RecommendationItem>>
-
-    @GET("/users/{id}/watchlist/{type}/{sort}")
-    fun getWatchList(
-        @Path("id") id: Long,
-        @Path("type") mediaType: String,
-        @Path("sort") sort: String = "added",
-    ): Call<List<WatchListItem>>
-
-    @GET("/users/{id}/history/{type}")
-    fun getWatchedHistory(
-        @Path("id") id: Long,
-        @Path("type") mediaType: String,
-    ): Call<HistoryItem>
-
-    @GET("/users/{id}/stats")
-    fun getStats(
-        @Path("id") id: Long,
-    ): Call<UserStats>
+    suspend fun getNewToken(@Body request: GetNewTokenRequest): Response<GetTokenResponse>
 
     /**
-     * Type is only 'movies' and 'shows'
+     * @param limit default (null) = 10, max limit = 100
+     * @param ignoreCollected true to filter out movies the user has already collected
+     */
+    @GET("/recommendations/{type}")
+    suspend fun getRecommendations(
+        @Path("type") mediaType: String,
+        @Query("limit") limit: Int,
+        @Query("ignore_collected") ignoreCollected: Boolean,
+    ): Response<List<RecommendationItem>>
+
+    /**
+     * @param id - user 'slug' of word 'me' if there is access_token in request headers
+     */
+    @GET("/users/{id}/watchlist/{type}/{sort}")
+    suspend fun getWatchList(
+        @Path("id") id: String,
+        @Path("type") type: String,
+        @Path("sort") sort: String,
+        @Query("page") page: Int,
+        @Query("limit") limit: Int,
+    ): Response<MutableList<WatchListItem>>
+
+    /**
+     * @param id - user 'slug' of word 'me' if there is access_token in request headers
+     */
+    @GET("/users/{id}/history/{type}")
+    suspend fun getWatchedHistory(
+        @Path("id") id: String,
+        @Path("type") mediaType: String,
+        @Query("page") page: Int,
+        @Query("limit") limit: Int,
+        @Query("item_id") itemId: Int,
+        @Query("start_at") startAt: String,
+        @Query("end_at") endAt: String,
+    ): Response<HistoryItem>
+
+    /**
+     * @param id - user 'slug' of word 'me' if there is access_token in request headers
+     */
+    @GET("/users/{id}/stats")
+    suspend fun getStats(
+        @Path("id") id: String,
+    ): Response<UserStats>
+
+    /**
+     * Type is only 'movies' and 'shows'.
+     *
+     * @param startDate in UTC
+     * @param daysToDisplay since startDay. default = 7, max = 33
      */
     @GET("/calendars/my/{type}/{start_date}/{days}")
-    fun getMyShows(
+    suspend fun getMyCalendar(
         @Path("type") mediaType: String,
-        @Path("start_date") startDate: LocalDate,
-        @Path("days") days: Int,
-    ): Call<List<CalendarItem>>
+        @Path("start_date") startDate: String,
+        @Path("days") daysToDisplay: Int,
+    ): Response<List<CalendarItem>>
 }

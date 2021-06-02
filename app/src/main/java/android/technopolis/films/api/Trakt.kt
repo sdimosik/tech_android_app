@@ -1,17 +1,16 @@
 package android.technopolis.films.api
 
-import android.technopolis.films.api.model.auth.GetNewTokenRequest
 import android.technopolis.films.api.model.media.CalendarItem
 import android.technopolis.films.api.model.media.HistoryItem
 import android.technopolis.films.api.model.media.MediaType
 import android.technopolis.films.api.model.media.RecommendationItem
+import android.technopolis.films.api.model.media.SortType
 import android.technopolis.films.api.model.media.WatchListItem
 import android.technopolis.films.api.model.stats.UserStats
-import retrofit2.Call
-import java.time.LocalDate
+import retrofit2.Response
 
 class Trakt(
-    traktClient: TraktClient
+    traktClient: TraktClient,
 ) {
     private val client: TraktClient = traktClient
         get() {
@@ -25,40 +24,51 @@ class Trakt(
         }
 
     private fun updateToken() {
-        if (timeToEnd < 0) {
+        if (timeToEnd > 0) {
             return
         }
-
-        val newToken = client.getNewToken(GetNewTokenRequest(
-            ApiConfig.token!!.refreshToken,
-            ApiConfig.clientId,
-            ApiConfig.clientSecret,
-            ApiConfig.redirectUrl
-        )).execute()
-
-        if (newToken.isSuccessful) {
-            ApiConfig.token = newToken.body()
-            TraktClientGenerator.saveToken(ApiConfig.token!!)
-        }
+        TraktClientGenerator.updateToken()
     }
 
-    fun getRecommendations(type: MediaType): Call<List<RecommendationItem>> {
-        return client.getRecommendations(type.name)
+    suspend fun getRecommendations(
+        type: MediaType,
+        limit: Int,
+        ignoreCollected: Boolean,
+    ): Response<List<RecommendationItem>> {
+        return client.getRecommendations(type.name, limit, ignoreCollected)
     }
 
-    fun getWatchList(id: Long, type: MediaType): Call<List<WatchListItem>> {
-        return client.getWatchList(id, type.name)
+    suspend fun getWatchList(
+        id: String,
+        type: MediaType,
+        sort: SortType,
+        page: Int,
+        limit: Int,
+    ): Response<MutableList<WatchListItem>> {
+        return client.getWatchList(id, type.name, sort.name, page, limit)
     }
 
-    fun getWatchedHistory(id: Long, type: MediaType): Call<HistoryItem> {
-        return client.getWatchedHistory(id, type.name)
+    suspend fun getWatchedHistory(
+        id: String,
+        type: MediaType,
+        page: Int,
+        limit: Int,
+        itemId: Int,
+        startAt: String,
+        endAt: String,
+    ): Response<HistoryItem> {
+        return client.getWatchedHistory(id, type.name, page, limit, itemId, startAt, endAt)
     }
 
-    fun getStats(id: Long): Call<UserStats> {
+    suspend fun getStats(id: String): Response<UserStats> {
         return client.getStats(id)
     }
 
-    fun getMyShows(type: MediaType, startDate: LocalDate, days: Int): Call<List<CalendarItem>> {
-        return client.getMyShows(type.name, startDate, days)
+    suspend fun getMyShows(
+        type: MediaType,
+        startDate: String,
+        days: Int,
+    ): Response<List<CalendarItem>> {
+        return client.getMyCalendar(type.name, startDate, days)
     }
 }

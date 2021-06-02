@@ -4,9 +4,9 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class MediaIds(
-    val trakt: String,
+    val trakt: Int,
     val slug: String? = null,
     val tvdb: String? = null,
     val imdb: String? = null,
-    val tmdb: String? = null,
+    val tmdb: Int? = null,
 )

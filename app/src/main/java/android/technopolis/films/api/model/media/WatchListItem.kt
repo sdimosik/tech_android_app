@@ -9,9 +9,11 @@ import java.time.LocalDateTime
 @Serializable
 data class WatchListItem(
     val rank: Int,
+    val id: Long,
     @SerialName("listed_at")
     val listedAt: String, //LocalDateTime,
-    override val type: MediaType,
+    val notes: String? = null,
+    override val type: String,
     override val movie: Movie? = null,
     override val show: Show? = null,
 ): Media

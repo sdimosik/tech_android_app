@@ -14,5 +14,5 @@ data class GetNewTokenRequest(
     @SerialName("redirect_uri")
     val redirectUri: String,
     @SerialName("grant_type")
-    val grantType: String = "refresh_token"
+    val grantType: String
 )
