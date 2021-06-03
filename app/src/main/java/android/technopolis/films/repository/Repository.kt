@@ -5,7 +5,7 @@ import android.technopolis.films.api.model.media.HistoryItem
 import android.technopolis.films.api.model.media.MediaType
 import android.technopolis.films.api.model.media.RecommendationItem
 import android.technopolis.films.api.model.stats.UserStats
-import android.technopolis.films.ui.watch.rvMediaHolder.Media
+import android.technopolis.films.api.model.media.Media
 import androidx.lifecycle.MutableLiveData
 import kotlinx.coroutines.flow.MutableStateFlow
 
