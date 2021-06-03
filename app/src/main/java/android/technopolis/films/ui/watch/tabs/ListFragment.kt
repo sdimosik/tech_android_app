@@ -2,9 +2,7 @@ package android.technopolis.films.ui.watch.tabs
 
 import android.os.Bundle
 import android.os.Parcelable
-import android.technopolis.films.R
 import android.technopolis.films.databinding.FragmentListBinding
-import android.technopolis.films.ui.watch.WatchFragment
 import android.technopolis.films.ui.watch.WatchViewModel
 import android.technopolis.films.ui.watch.rvMediaHolder.MediaAdapter
 import android.view.LayoutInflater

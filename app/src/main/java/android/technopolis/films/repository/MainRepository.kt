@@ -8,7 +8,7 @@ import android.technopolis.films.api.model.media.MediaType
 import android.technopolis.films.api.model.media.RecommendationItem
 import android.technopolis.films.api.model.media.SortType
 import android.technopolis.films.api.model.stats.UserStats
-import android.technopolis.films.ui.watch.rvMediaHolder.Media
+import android.technopolis.films.api.model.media.Media
 import androidx.lifecycle.MutableLiveData
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
@@ -135,8 +135,7 @@ class MainRepository : Repository {
 
             if (watchList.isSuccessful) {
                 for (item in watchList.body()!!) {
-                    val title = item.movie!!.title
-                    list.value!!.add(Media(title))
+                    list.value!!.add(item)
                 }
             } else {
                 println(watchList.errorBody())
