@@ -7,12 +7,13 @@ import android.technopolis.films.api.model.media.RecommendationItem
 import android.technopolis.films.api.model.media.SortType
 import android.technopolis.films.api.model.media.WatchListItem
 import android.technopolis.films.api.model.stats.UserStats
+import kotlinx.coroutines.flow.MutableStateFlow
 import retrofit2.Response
 
 class Trakt(
-    traktClient: TraktClient,
+    traktClient: MutableStateFlow<TraktClient?>,
 ) {
-    private val client: TraktClient = traktClient
+    private var client: MutableStateFlow<TraktClient?> = traktClient
         get() {
             updateToken()
             return field
@@ -34,8 +35,8 @@ class Trakt(
         type: MediaType,
         limit: Int,
         ignoreCollected: Boolean,
-    ): Response<List<RecommendationItem>> {
-        return client.getRecommendations(type.name, limit, ignoreCollected)
+    ): Response<MutableList<RecommendationItem>> {
+        return client.value!!.getRecommendations(type.name, limit, ignoreCollected)
     }
 
     suspend fun getWatchList(
@@ -45,7 +46,7 @@ class Trakt(
         page: Int,
         limit: Int,
     ): Response<MutableList<WatchListItem>> {
-        return client.getWatchList(id, type.name, sort.name, page, limit)
+        return client.value!!.getWatchList(id, type.name, sort.name, page, limit)
     }
 
     suspend fun getWatchedHistory(
@@ -53,22 +54,22 @@ class Trakt(
         type: MediaType,
         page: Int,
         limit: Int,
-        itemId: Int,
-        startAt: String,
-        endAt: String,
-    ): Response<HistoryItem> {
-        return client.getWatchedHistory(id, type.name, page, limit, itemId, startAt, endAt)
+        itemId: Int?,
+        startAt: String?,
+        endAt: String?,
+    ): Response<MutableList<HistoryItem>> {
+        return client.value!!.getWatchedHistory(id, type.name, page, limit, itemId, startAt, endAt)
     }
 
     suspend fun getStats(id: String): Response<UserStats> {
-        return client.getStats(id)
+        return client.value!!.getStats(id)
     }
 
-    suspend fun getMyShows(
+    suspend fun getMyCalendar(
         type: MediaType,
         startDate: String,
         days: Int,
-    ): Response<List<CalendarItem>> {
-        return client.getMyCalendar(type.name, startDate, days)
+    ): Response<MutableList<CalendarItem>> {
+        return client.value!!.getMyCalendar(type.name, startDate, days)
     }
 }

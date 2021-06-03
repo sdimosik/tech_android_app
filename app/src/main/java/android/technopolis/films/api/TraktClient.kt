@@ -36,8 +36,8 @@ interface TraktClient {
     suspend fun getRecommendations(
         @Path("type") mediaType: String,
         @Query("limit") limit: Int,
-        @Query("ignore_collected") ignoreCollected: Boolean,
-    ): Response<List<RecommendationItem>>
+        @Query("ignore_collected") ignoreCollected: Boolean?,
+    ): Response<MutableList<RecommendationItem>>
 
     /**
      * @param id - user 'slug' of word 'me' if there is access_token in request headers
@@ -47,8 +47,8 @@ interface TraktClient {
         @Path("id") id: String,
         @Path("type") type: String,
         @Path("sort") sort: String,
-        @Query("page") page: Int,
-        @Query("limit") limit: Int,
+        @Query("page") page: Int?,
+        @Query("limit") limit: Int?,
     ): Response<MutableList<WatchListItem>>
 
     /**
@@ -58,12 +58,12 @@ interface TraktClient {
     suspend fun getWatchedHistory(
         @Path("id") id: String,
         @Path("type") mediaType: String,
-        @Query("page") page: Int,
-        @Query("limit") limit: Int,
-        @Query("item_id") itemId: Int,
-        @Query("start_at") startAt: String,
-        @Query("end_at") endAt: String,
-    ): Response<HistoryItem>
+        @Query("page") page: Int?,
+        @Query("limit") limit: Int?,
+        @Query("item_id") itemId: Int?,
+        @Query("start_at") startAt: String?,
+        @Query("end_at") endAt: String?,
+    ): Response<MutableList<HistoryItem>>
 
     /**
      * @param id - user 'slug' of word 'me' if there is access_token in request headers
@@ -84,5 +84,5 @@ interface TraktClient {
         @Path("type") mediaType: String,
         @Path("start_date") startDate: String,
         @Path("days") daysToDisplay: Int,
-    ): Response<List<CalendarItem>>
+    ): Response<MutableList<CalendarItem>>
 }
