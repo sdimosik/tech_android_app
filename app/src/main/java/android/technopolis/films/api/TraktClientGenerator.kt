@@ -4,16 +4,15 @@ import android.content.SharedPreferences
 import android.technopolis.films.api.model.auth.GetNewTokenRequest
 import android.technopolis.films.api.model.auth.GetTokenRequest
 import android.technopolis.films.api.model.auth.GetTokenResponse
-import androidx.core.os.trace
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import okhttp3.MediaType
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -27,7 +26,7 @@ import retrofit2.Retrofit
  *  2.1) Exception thrown -> User is not logged in -> (hasLogin() == false)
  *      a) take loginUrl and redirect user
  *      b) obtain code
- *      c) invoke getClient(code)
+ *      c) invoke doLogin(code)
  *  2.2) hasLogin() == true
  *      a) invoke getClient()
  *
@@ -77,8 +76,10 @@ class TraktClientGenerator {
                     .build()
             }
 
-        private val traktClient: TraktClient by lazy {
-            api.create(TraktClient::class.java)
+        private var traktClient: MutableStateFlow<TraktClient?> = MutableStateFlow(null)
+
+        private fun createClient(): TraktClient {
+            return api.create(TraktClient::class.java)
         }
 
         private fun restoreToken(): GetTokenResponse? {
@@ -90,6 +91,7 @@ class TraktClientGenerator {
             if (!str.equals("") && (str != null)) {
                 val token = Json.decodeFromString<GetTokenResponse>(str)
                 ApiConfig.token = token
+                traktClient.value = createClient()
                 return token
             }
 
@@ -97,10 +99,12 @@ class TraktClientGenerator {
         }
 
         private fun saveToken(token: GetTokenResponse) {
+            ApiConfig.token = token
             val edit = preferences?.edit()
             val tokenInString = Json.encodeToString(token)
             edit?.putString(TOKEN_NAME, tokenInString)
             edit?.apply()
+            traktClient.value = updateClient()
         }
 
         /**
@@ -114,12 +118,11 @@ class TraktClientGenerator {
                 ApiConfig.redirectUrl,
                 AUTHORIZATION_CODE
             )
-
+            traktClient.value = createClient()
             GlobalScope.launch(Dispatchers.IO) {
-                val token = traktClient.getToken(request)
+                val token = traktClient.value!!.getToken(request)
                 if (token.isSuccessful) {
-                    ApiConfig.token = token.body()
-                    saveToken(ApiConfig.token!!)
+                    saveToken(token.body()!!)
                 }
             }
         }
@@ -132,15 +135,22 @@ class TraktClientGenerator {
                 ApiConfig.redirectUrl,
                 REFRESH_TOKEN
             )
+
+            if (traktClient.value == null) {
+                traktClient.value = createClient()
+            }
+
             runBlocking(Dispatchers.IO) {
-                val token = traktClient.getNewToken(request)
+                val token = traktClient.value!!.getNewToken(request)
                 if (token.isSuccessful) {
-                    ApiConfig.token = token.body()
-                    saveToken(ApiConfig.token!!)
+                    saveToken(token.body()!!)
                 }
             }
         }
 
+        fun updateClient(): TraktClient {
+            return createClient()
+        }
 
         fun getClient(): Trakt {
             if (!hasLogin()) {
