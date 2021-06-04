@@ -11,9 +11,12 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 
 class ListFragment : Fragment() {
     private var binding: FragmentListBinding? = null
@@ -33,7 +36,7 @@ class ListFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         binding = FragmentListBinding.inflate(inflater, container, false)
         return binding?.root!!
@@ -45,6 +48,7 @@ class ListFragment : Fragment() {
             viewModel.onPageChanged(getState())
         }
     }
+
     private var onScrollListener: OnScrollListener? = null
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -73,10 +77,10 @@ class ListFragment : Fragment() {
     private fun setupRecyclerView() {
         listAdapter = MediaAdapter()
 
-        viewModel.medias.observe(viewLifecycleOwner, Observer {
-            it ?: return@Observer
+        val medias = viewModel.medias
+        medias.onEach {
             listAdapter.submitList(it)
-        })
+        }.launchIn(lifecycleScope)
 
         binding?.let {
             with(it.mediaListRecyclerView) {
