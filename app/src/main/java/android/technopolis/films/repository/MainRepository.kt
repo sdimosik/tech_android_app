@@ -12,7 +12,6 @@ import android.technopolis.films.api.model.media.Media
 import android.technopolis.films.api.model.users.settings.UserSettings
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.asFlow
-import androidx.lifecycle.asLiveData
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.Flow
@@ -20,7 +19,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import java.time.LocalDate
 
 class MainRepository : Repository {
     private val client: Trakt = TraktClientGenerator.getClient()
@@ -93,7 +91,7 @@ class MainRepository : Repository {
     private val _moviesWatchList = MutableLiveData<MutableList<Media>>(mutableListOf())
     override val moviesWatchList: Flow<MutableList<Media>> = _moviesWatchList.asFlow()
 
-    private var _currentMoviesWatchListPage = 0
+    private var _currentMoviesWatchListPage = MutableStateFlow(0)
 
     /*____________________________________________________________________________________________*/
 
@@ -102,7 +100,7 @@ class MainRepository : Repository {
 
     private val _showsWatchList = MutableLiveData<MutableList<Media>>(mutableListOf())
     override val showsWatchList: Flow<MutableList<Media>> = _showsWatchList.asFlow()
-    private var _currentShowsWatchListPage = 0
+    private var _currentShowsWatchListPage = MutableStateFlow(0)
     /*____________________________________________________________________________________________*/
 
     override fun getWatchList(type: MediaType) {
@@ -124,18 +122,18 @@ class MainRepository : Repository {
     private fun getWatchList(
         type: MediaType,
         id: String,
-        currentPage: Int,
+        currentPage: MutableStateFlow<Int>,
         list: MutableLiveData<MutableList<Media>>,
         loadingState: MutableStateFlow<Boolean>,
     ) {
-        currentPage.inc()
+        currentPage.value += 1
         MainScope().launch(Dispatchers.IO) {
             loadingState.value = true
             val watchList = client.getWatchList(
                 id,
                 type,
                 SortType.added,
-                currentPage,
+                currentPage.value,
                 LIMIT_ON_PAGE
             )
 
@@ -157,7 +155,7 @@ class MainRepository : Repository {
 
     private val _moviesHistory = MutableLiveData<MutableList<HistoryItem>>(mutableListOf())
     override val moviesHistory: Flow<MutableList<HistoryItem>> = _moviesHistory.asFlow()
-    private var _currentMoviesHistoryPage = 0
+    private var _currentMoviesHistoryPage = MutableStateFlow(0)
 
     /*____________________________________________________________________________________________*/
 
@@ -166,7 +164,7 @@ class MainRepository : Repository {
 
     private val _showsHistory = MutableLiveData<MutableList<HistoryItem>>(mutableListOf())
     override val showsHistory: Flow<MutableList<HistoryItem>> = _showsHistory.asFlow()
-    private var _currentShowsHistoryPage: Int = 0
+    private var _currentShowsHistoryPage = MutableStateFlow(0)
 
     override fun getWatchedHistory(type: MediaType) {
         when (type) {
@@ -187,15 +185,15 @@ class MainRepository : Repository {
     private fun getWatchedHistory(
         type: MediaType,
         id: String,
-        currentPage: Int,
+        currentPage: MutableStateFlow<Int>,
         list: MutableLiveData<MutableList<HistoryItem>>,
         loadingState: MutableStateFlow<Boolean>,
     ) {
-        currentPage.inc()
+        currentPage.value += 1
         MainScope().launch(Dispatchers.IO) {
             loadingState.value = true
             val watchHistory =
-                client.getWatchedHistory(id, type, currentPage, LIMIT_ON_PAGE, null, null, null)
+                client.getWatchedHistory(id, type, currentPage.value, LIMIT_ON_PAGE, null, null, null)
             if (watchHistory.isSuccessful) {
                 for (item in watchHistory.body()!!) {
                     list.value!!.add(item)
