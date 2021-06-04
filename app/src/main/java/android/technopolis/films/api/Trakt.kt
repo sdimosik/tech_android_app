@@ -6,7 +6,8 @@ import android.technopolis.films.api.model.media.MediaType
 import android.technopolis.films.api.model.media.RecommendationItem
 import android.technopolis.films.api.model.media.SortType
 import android.technopolis.films.api.model.media.WatchListItem
-import android.technopolis.films.api.model.stats.UserStats
+import android.technopolis.films.api.model.users.settings.UserSettings
+import android.technopolis.films.api.model.users.stats.UserStats
 import kotlinx.coroutines.flow.MutableStateFlow
 import retrofit2.Response
 
@@ -71,5 +72,9 @@ class Trakt(
         days: Int,
     ): Response<MutableList<CalendarItem>> {
         return client.value!!.getMyCalendar(type.name, startDate, days)
+    }
+
+    suspend fun getUserSettings(): Response<UserSettings> {
+        return client.value!!.getUserSettings()
     }
 }

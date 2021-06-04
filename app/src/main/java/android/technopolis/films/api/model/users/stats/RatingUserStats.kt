@@ -1,4 +1,4 @@
-package android.technopolis.films.api.model.stats
+package android.technopolis.films.api.model.users.stats
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable

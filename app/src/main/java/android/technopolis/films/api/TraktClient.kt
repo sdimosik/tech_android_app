@@ -7,7 +7,8 @@ import android.technopolis.films.api.model.media.CalendarItem
 import android.technopolis.films.api.model.media.HistoryItem
 import android.technopolis.films.api.model.media.RecommendationItem
 import android.technopolis.films.api.model.media.WatchListItem
-import android.technopolis.films.api.model.stats.UserStats
+import android.technopolis.films.api.model.users.settings.UserSettings
+import android.technopolis.films.api.model.users.stats.UserStats
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -85,4 +86,7 @@ interface TraktClient {
         @Path("start_date") startDate: String,
         @Path("days") daysToDisplay: Int,
     ): Response<MutableList<CalendarItem>>
+
+    @GET("/users/settings")
+    suspend fun getUserSettings(): Response<UserSettings>
 }

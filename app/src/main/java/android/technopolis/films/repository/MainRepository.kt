@@ -7,8 +7,9 @@ import android.technopolis.films.api.model.media.HistoryItem
 import android.technopolis.films.api.model.media.MediaType
 import android.technopolis.films.api.model.media.RecommendationItem
 import android.technopolis.films.api.model.media.SortType
-import android.technopolis.films.api.model.stats.UserStats
+import android.technopolis.films.api.model.users.stats.UserStats
 import android.technopolis.films.api.model.media.Media
+import android.technopolis.films.api.model.users.settings.UserSettings
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.asFlow
 import androidx.lifecycle.asLiveData
@@ -279,6 +280,27 @@ class MainRepository : Repository {
                 println(calendar.errorBody())
             }
             loadingState.value = false
+        }
+    }
+
+    /*============================================================================================*/
+
+    private var _userSettingsLoading: MutableStateFlow<Boolean> = MutableStateFlow(false)
+    override val userSettingsLoading: StateFlow<Boolean> = _userSettingsLoading.asStateFlow()
+
+    private val _userSettings = MutableLiveData<UserSettings>()
+    override val userSettings: Flow<UserSettings> = _userSettings.asFlow()
+
+    override fun getUserSettings() {
+        MainScope().launch(Dispatchers.IO) {
+            _userSettingsLoading.value = true
+            val settings = client.getUserSettings()
+            if (settings.isSuccessful) {
+                _userSettings.value = settings.body()
+            } else {
+                println(settings.errorBody())
+            }
+            _userSettingsLoading.value = false
         }
     }
 
