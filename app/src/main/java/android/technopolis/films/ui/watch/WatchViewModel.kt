@@ -6,6 +6,7 @@ import android.technopolis.films.repository.MainRepository
 import android.technopolis.films.repository.Repository
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -19,8 +20,8 @@ class WatchViewModel : ViewModel() {
 
     private val repository: Repository = MainRepository()
 
-    private val _medias: MutableLiveData<MutableList<Media>> = repository.moviesWatchList
-    val medias: MutableLiveData<MutableList<Media>> = _medias
+    private val _medias: Flow<MutableList<Media>> = repository.moviesWatchList
+    val medias: Flow<MutableList<Media>> = _medias
 
     fun onPageChanged(savedState: Bundle) {
         tabArgs.putAll(savedState)
