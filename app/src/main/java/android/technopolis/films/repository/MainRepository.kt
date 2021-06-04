@@ -92,6 +92,7 @@ class MainRepository : Repository {
     override val moviesWatchList: Flow<MutableList<Media>> = _moviesWatchList.asFlow()
 
     private var _currentMoviesWatchListPage = MutableStateFlow(0)
+    private var _isMoviesWatchListEnded = MutableStateFlow(false)
 
     /*____________________________________________________________________________________________*/
 
@@ -101,6 +102,8 @@ class MainRepository : Repository {
     private val _showsWatchList = MutableLiveData<MutableList<Media>>(mutableListOf())
     override val showsWatchList: Flow<MutableList<Media>> = _showsWatchList.asFlow()
     private var _currentShowsWatchListPage = MutableStateFlow(0)
+    private var _isShowsWatchListEnded = MutableStateFlow(false)
+
     /*____________________________________________________________________________________________*/
 
     override fun getWatchList(type: MediaType) {
@@ -109,13 +112,15 @@ class MainRepository : Repository {
                 "me",
                 _currentMoviesWatchListPage,
                 _moviesWatchList,
-                _moviesWatchListLoading)
+                _moviesWatchListLoading,
+                _isMoviesWatchListEnded)
 
             MediaType.shows -> getWatchList(type,
                 "me",
                 _currentShowsWatchListPage,
                 _showsWatchList,
-                _showsWatchListLoading)
+                _showsWatchListLoading,
+                _isShowsWatchListEnded)
         }
     }
 
@@ -125,7 +130,11 @@ class MainRepository : Repository {
         currentPage: MutableStateFlow<Int>,
         list: MutableLiveData<MutableList<Media>>,
         loadingState: MutableStateFlow<Boolean>,
+        isEnded: MutableStateFlow<Boolean>,
     ) {
+        if (isEnded.value) {
+            return
+        }
         currentPage.value += 1
         MainScope().launch(Dispatchers.IO) {
             loadingState.value = true
@@ -138,6 +147,10 @@ class MainRepository : Repository {
             )
 
             if (watchList.isSuccessful) {
+                if (watchList.body()!!.size < LIMIT_ON_PAGE) {
+                    isEnded.value = true
+                }
+
                 for (item in watchList.body()!!) {
                     list.value!!.add(item)
                 }
@@ -156,6 +169,7 @@ class MainRepository : Repository {
     private val _moviesHistory = MutableLiveData<MutableList<HistoryItem>>(mutableListOf())
     override val moviesHistory: Flow<MutableList<HistoryItem>> = _moviesHistory.asFlow()
     private var _currentMoviesHistoryPage = MutableStateFlow(0)
+    private var _isMoviesHistoryEnded = MutableStateFlow(false)
 
     /*____________________________________________________________________________________________*/
 
@@ -165,6 +179,7 @@ class MainRepository : Repository {
     private val _showsHistory = MutableLiveData<MutableList<HistoryItem>>(mutableListOf())
     override val showsHistory: Flow<MutableList<HistoryItem>> = _showsHistory.asFlow()
     private var _currentShowsHistoryPage = MutableStateFlow(0)
+    private var _isShowsHistoryEnded = MutableStateFlow(false)
 
     override fun getWatchedHistory(type: MediaType) {
         when (type) {
@@ -172,13 +187,15 @@ class MainRepository : Repository {
                 "me",
                 _currentMoviesHistoryPage,
                 _moviesHistory,
-                _moviesHistoryLoading)
+                _moviesHistoryLoading,
+                _isMoviesHistoryEnded)
 
             MediaType.shows -> getWatchedHistory(type,
                 "me",
                 _currentShowsHistoryPage,
                 _showsHistory,
-                _showsHistoryLoading)
+                _showsHistoryLoading,
+                _isShowsHistoryEnded)
         }
     }
 
@@ -188,13 +205,29 @@ class MainRepository : Repository {
         currentPage: MutableStateFlow<Int>,
         list: MutableLiveData<MutableList<HistoryItem>>,
         loadingState: MutableStateFlow<Boolean>,
+        isEnded: MutableStateFlow<Boolean>,
     ) {
+        if (isEnded.value) {
+            return
+        }
+
         currentPage.value += 1
         MainScope().launch(Dispatchers.IO) {
             loadingState.value = true
             val watchHistory =
-                client.getWatchedHistory(id, type, currentPage.value, LIMIT_ON_PAGE, null, null, null)
+                client.getWatchedHistory(id,
+                    type,
+                    currentPage.value,
+                    LIMIT_ON_PAGE,
+                    null,
+                    null,
+                    null)
+
             if (watchHistory.isSuccessful) {
+                if (watchHistory.body()!!.size < LIMIT_ON_PAGE) {
+                    isEnded.value = true
+                }
+
                 for (item in watchHistory.body()!!) {
                     list.value!!.add(item)
                 }
