@@ -73,13 +73,10 @@ class MainRepository : Repository {
                 ignoreCollected,
             )
 
-            if (recommendations.isSuccessful) {
-                for (item in recommendations.body()!!) {
-                    list.value!!.add(item)
-                }
-            } else {
-                println(recommendations.errorBody())
+            list.value!!.apply {
+                addAll(size, recommendations)
             }
+
             loadingState.value = false
         }
     }
@@ -146,21 +143,31 @@ class MainRepository : Repository {
                 LIMIT_ON_PAGE
             )
 
-            if (watchList.isSuccessful) {
-                if (watchList.body()!!.size < LIMIT_ON_PAGE) {
-                    isEnded.value = true
-                }
+            if (watchList.size < LIMIT_ON_PAGE) {
+                isEnded.value = true
+            }
 
-                for (item in watchList.body()!!) {
-                    list.value!!.add(item)
-                }
-            } else {
-                println(watchList.errorBody())
+            list.value!!.apply {
+                addAll(size, watchList)
             }
             loadingState.value = false
         }
     }
 
+    override fun updateWatchList(type: MediaType) {
+        when (type) {
+            MediaType.movies -> {
+                _currentMoviesWatchListPage.value = 0
+                _moviesWatchList.value = mutableListOf()
+                getWatchList(type)
+            }
+            MediaType.shows -> {
+                _currentShowsWatchListPage.value = 0
+                _showsWatchList.value = mutableListOf()
+                getWatchList(type)
+            }
+        }
+    }
     /*============================================================================================*/
 
     private var _moviesHistoryLoading: MutableStateFlow<Boolean> = MutableStateFlow(false)
@@ -214,29 +221,25 @@ class MainRepository : Repository {
         currentPage.value += 1
         MainScope().launch(Dispatchers.IO) {
             loadingState.value = true
-            val watchHistory =
-                client.getWatchedHistory(id,
-                    type,
-                    currentPage.value,
-                    LIMIT_ON_PAGE,
-                    null,
-                    null,
-                    null)
+            val watchHistory = client.getWatchedHistory(id,
+                type,
+                currentPage.value,
+                LIMIT_ON_PAGE,
+                null,
+                null,
+                null)
 
-            if (watchHistory.isSuccessful) {
-                if (watchHistory.body()!!.size < LIMIT_ON_PAGE) {
-                    isEnded.value = true
-                }
-
-                for (item in watchHistory.body()!!) {
-                    list.value!!.add(item)
-                }
-            } else {
-                println(watchHistory.errorBody())
+            if (watchHistory.size < LIMIT_ON_PAGE) {
+                isEnded.value = true
             }
-            loadingState.value = false
+
+            list.value!!.apply {
+                addAll(size, watchHistory)
+            }
         }
+        loadingState.value = false
     }
+
     /*============================================================================================*/
 
     private var _statsLoading: MutableStateFlow<Boolean> = MutableStateFlow(false)
@@ -248,12 +251,7 @@ class MainRepository : Repository {
     override fun getStats(id: String) {
         MainScope().launch(Dispatchers.IO) {
             _statsLoading.value = true
-            val stats = client.getStats(id)
-            if (stats.isSuccessful) {
-                _stats.value = stats.body()
-            } else {
-                println(stats.errorBody())
-            }
+            _stats.value = client.getStats(id)
             _statsLoading.value = false
         }
     }
@@ -303,12 +301,8 @@ class MainRepository : Repository {
         MainScope().launch(Dispatchers.IO) {
             loadingState.value = true
             val calendar = client.getMyCalendar(type, startDate, days)
-            if (calendar.isSuccessful) {
-                for (item in calendar.body()!!) {
-                    list.value!!.add(item)
-                }
-            } else {
-                println(calendar.errorBody())
+            list.value!!.apply {
+                addAll(size, calendar)
             }
             loadingState.value = false
         }
@@ -325,12 +319,7 @@ class MainRepository : Repository {
     override fun getUserSettings() {
         MainScope().launch(Dispatchers.IO) {
             _userSettingsLoading.value = true
-            val settings = client.getUserSettings()
-            if (settings.isSuccessful) {
-                _userSettings.value = settings.body()
-            } else {
-                println(settings.errorBody())
-            }
+            _userSettings.value = client.getUserSettings()
             _userSettingsLoading.value = false
         }
     }

@@ -9,7 +9,6 @@ import android.technopolis.films.api.model.media.WatchListItem
 import android.technopolis.films.api.model.users.settings.UserSettings
 import android.technopolis.films.api.model.users.stats.UserStats
 import kotlinx.coroutines.flow.MutableStateFlow
-import retrofit2.Response
 
 class Trakt(
     traktClient: MutableStateFlow<TraktClient?>,
@@ -36,8 +35,15 @@ class Trakt(
         type: MediaType,
         limit: Int,
         ignoreCollected: Boolean,
-    ): Response<MutableList<CommonMediaItem>> {
-        return client.value!!.getRecommendations(type.name, limit, ignoreCollected)
+    ): MutableList<CommonMediaItem> {
+        val recommendations = client.value!!.getRecommendations(type.name, limit, ignoreCollected)
+
+        if (!recommendations.isSuccessful) {
+            println(recommendations.errorBody())
+            return mutableListOf()
+        }
+
+        return recommendations.body()!!
     }
 
     suspend fun getWatchList(
@@ -46,8 +52,14 @@ class Trakt(
         sort: SortType,
         page: Int,
         limit: Int,
-    ): Response<MutableList<WatchListItem>> {
-        return client.value!!.getWatchList(id, type.name, sort.name, page, limit)
+    ): MutableList<WatchListItem> {
+        val watchList = client.value!!.getWatchList(id, type.name, sort.name, page, limit)
+        if (!watchList.isSuccessful) {
+            println(watchList.errorBody())
+            return mutableListOf()
+        }
+
+        return watchList.body()!!
     }
 
     suspend fun getWatchedHistory(
@@ -58,23 +70,42 @@ class Trakt(
         itemId: Int?,
         startAt: String?,
         endAt: String?,
-    ): Response<MutableList<HistoryItem>> {
-        return client.value!!.getWatchedHistory(id, type.name, page, limit, itemId, startAt, endAt)
+    ): MutableList<HistoryItem> {
+        val watchedHistory =
+            client.value!!.getWatchedHistory(id, type.name, page, limit, itemId, startAt, endAt)
+        if (!watchedHistory.isSuccessful) {
+            println(watchedHistory.errorBody())
+            return mutableListOf()
+        }
+        return watchedHistory.body()!!
     }
 
-    suspend fun getStats(id: String): Response<UserStats> {
-        return client.value!!.getStats(id)
+    suspend fun getStats(id: String): UserStats {
+        val stats = client.value!!.getStats(id)
+        if (!stats.isSuccessful) {
+            println(stats.errorBody())
+        }
+        return stats.body()!!
     }
 
     suspend fun getMyCalendar(
         type: MediaType,
         startDate: String,
         days: Int,
-    ): Response<MutableList<CalendarItem>> {
-        return client.value!!.getMyCalendar(type.name, startDate, days)
+    ): MutableList<CalendarItem> {
+        val myCalendar = client.value!!.getMyCalendar(type.name, startDate, days)
+        if (!myCalendar.isSuccessful) {
+            println(myCalendar.errorBody())
+            return mutableListOf()
+        }
+        return myCalendar.body()!!
     }
 
-    suspend fun getUserSettings(): Response<UserSettings> {
-        return client.value!!.getUserSettings()
+    suspend fun getUserSettings(): UserSettings {
+        val userSettings = client.value!!.getUserSettings()
+        if (!userSettings.isSuccessful) {
+            println(userSettings.errorBody())
+        }
+        return userSettings.body()!!
     }
 }

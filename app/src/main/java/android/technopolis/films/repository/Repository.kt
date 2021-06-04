@@ -24,6 +24,7 @@ interface Repository {
     val showsWatchList: Flow<MutableList<Media>>
     val showsWatchListLoading: StateFlow<Boolean>
     fun getWatchList(type: MediaType)
+    fun updateWatchList(type: MediaType)
 
     /*============================================================================================*/
 
