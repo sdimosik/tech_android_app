@@ -10,9 +10,14 @@ import android.technopolis.films.api.model.media.SortType
 import android.technopolis.films.api.model.stats.UserStats
 import android.technopolis.films.api.model.media.Media
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.asFlow
+import androidx.lifecycle.asLiveData
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 
@@ -20,24 +25,24 @@ class MainRepository : Repository {
     private val client: Trakt = TraktClientGenerator.getClient()
 
     private var _moviesRecommendationsLoading: MutableStateFlow<Boolean> = MutableStateFlow(false)
-    override val moviesRecommendationsLoading: MutableStateFlow<Boolean> =
-        _moviesRecommendationsLoading
+    override val moviesRecommendationsLoading: StateFlow<Boolean> =
+        _moviesRecommendationsLoading.asStateFlow()
 
     private val _moviesRecommendations =
         MutableLiveData<MutableList<RecommendationItem>>(mutableListOf())
-    override val moviesRecommendations: MutableLiveData<MutableList<RecommendationItem>> =
-        _moviesRecommendations
+    override val moviesRecommendations: Flow<MutableList<RecommendationItem>> =
+        _moviesRecommendations.asFlow()
 
     /*____________________________________________________________________________________________*/
 
     private var _showsRecommendationsLoading: MutableStateFlow<Boolean> = MutableStateFlow(false)
-    override val showsRecommendationsLoading: MutableStateFlow<Boolean> =
-        _showsRecommendationsLoading
+    override val showsRecommendationsLoading: StateFlow<Boolean> =
+        _showsRecommendationsLoading.asStateFlow()
 
     private val _showsRecommendations =
         MutableLiveData<MutableList<RecommendationItem>>(mutableListOf())
-    override val showsRecommendations: MutableLiveData<MutableList<RecommendationItem>> =
-        _showsRecommendations
+    override val showsRecommendations: Flow<MutableList<RecommendationItem>> =
+        _showsRecommendations.asFlow()
 
     override fun getRecommendations(type: MediaType, ignoreCollected: Boolean) {
         when (type) {
@@ -82,20 +87,20 @@ class MainRepository : Repository {
     /*============================================================================================*/
 
     private var _moviesWatchListLoading: MutableStateFlow<Boolean> = MutableStateFlow(false)
-    override val moviesWatchListLoading: MutableStateFlow<Boolean> = _moviesWatchListLoading
+    override val moviesWatchListLoading: StateFlow<Boolean> = _moviesWatchListLoading.asStateFlow()
 
     private val _moviesWatchList = MutableLiveData<MutableList<Media>>(mutableListOf())
-    override val moviesWatchList: MutableLiveData<MutableList<Media>> = _moviesWatchList
+    override val moviesWatchList: Flow<MutableList<Media>> = _moviesWatchList.asFlow()
 
     private var _currentMoviesWatchListPage = 0
 
     /*____________________________________________________________________________________________*/
 
     private var _showsWatchListLoading: MutableStateFlow<Boolean> = MutableStateFlow(false)
-    override val showsWatchListLoading: MutableStateFlow<Boolean> = _showsWatchListLoading
+    override val showsWatchListLoading: StateFlow<Boolean> = _showsWatchListLoading.asStateFlow()
 
     private val _showsWatchList = MutableLiveData<MutableList<Media>>(mutableListOf())
-    override val showsWatchList: MutableLiveData<MutableList<Media>> = _showsWatchList
+    override val showsWatchList: Flow<MutableList<Media>> = _showsWatchList.asFlow()
     private var _currentShowsWatchListPage = 0
     /*____________________________________________________________________________________________*/
 
@@ -147,19 +152,19 @@ class MainRepository : Repository {
     /*============================================================================================*/
 
     private var _moviesHistoryLoading: MutableStateFlow<Boolean> = MutableStateFlow(false)
-    override val moviesHistoryLoading: MutableStateFlow<Boolean> = _moviesHistoryLoading
+    override val moviesHistoryLoading: StateFlow<Boolean> = _moviesHistoryLoading.asStateFlow()
 
     private val _moviesHistory = MutableLiveData<MutableList<HistoryItem>>(mutableListOf())
-    override val moviesHistory: MutableLiveData<MutableList<HistoryItem>> = _moviesHistory
+    override val moviesHistory: Flow<MutableList<HistoryItem>> = _moviesHistory.asFlow()
     private var _currentMoviesHistoryPage = 0
 
     /*____________________________________________________________________________________________*/
 
     private var _showsHistoryLoading: MutableStateFlow<Boolean> = MutableStateFlow(false)
-    override val showsHistoryLoading: MutableStateFlow<Boolean> = _showsHistoryLoading
+    override val showsHistoryLoading: StateFlow<Boolean> = _showsHistoryLoading.asStateFlow()
 
     private val _showsHistory = MutableLiveData<MutableList<HistoryItem>>(mutableListOf())
-    override val showsHistory: MutableLiveData<MutableList<HistoryItem>> = _showsHistory
+    override val showsHistory: Flow<MutableList<HistoryItem>> = _showsHistory.asFlow()
     private var _currentShowsHistoryPage: Int = 0
 
     override fun getWatchedHistory(type: MediaType) {
@@ -203,10 +208,10 @@ class MainRepository : Repository {
     /*============================================================================================*/
 
     private var _statsLoading: MutableStateFlow<Boolean> = MutableStateFlow(false)
-    override val statsLoading: MutableStateFlow<Boolean> = _statsLoading
+    override val statsLoading: StateFlow<Boolean> = _statsLoading.asStateFlow()
 
     private val _stats = MutableLiveData<UserStats?>()
-    override val stats: MutableLiveData<UserStats?> = _stats
+    override val stats: Flow<UserStats?> = _stats.asFlow()
 
     override fun getStats(id: String) {
         MainScope().launch(Dispatchers.IO) {
@@ -223,18 +228,18 @@ class MainRepository : Repository {
     /*============================================================================================*/
 
     private var _moviesCalendarLoading: MutableStateFlow<Boolean> = MutableStateFlow(false)
-    override val moviesCalendarLoading: MutableStateFlow<Boolean> = _moviesCalendarLoading
+    override val moviesCalendarLoading: StateFlow<Boolean> = _moviesCalendarLoading.asStateFlow()
 
     private val _moviesCalendar = MutableLiveData<MutableList<CalendarItem>>(mutableListOf())
-    override val moviesCalendar: MutableLiveData<MutableList<CalendarItem>> = _moviesCalendar
+    override val moviesCalendar: Flow<MutableList<CalendarItem>> = _moviesCalendar.asFlow()
 
     /*____________________________________________________________________________________________*/
 
     private var _showsCalendarLoading: MutableStateFlow<Boolean> = MutableStateFlow(false)
-    override val showsCalendarLoading: MutableStateFlow<Boolean> = _showsCalendarLoading
+    override val showsCalendarLoading: StateFlow<Boolean> = _showsCalendarLoading.asStateFlow()
 
     private val _showsCalendar = MutableLiveData<MutableList<CalendarItem>>(mutableListOf())
-    override val showsCalendar: MutableLiveData<MutableList<CalendarItem>> = _showsCalendar
+    override val showsCalendar: Flow<MutableList<CalendarItem>> = _showsCalendar.asFlow()
 
     override fun getMyCalendar(
         type: MediaType,
