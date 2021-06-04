@@ -3,9 +3,9 @@ package android.technopolis.films.repository
 import android.technopolis.films.api.Trakt
 import android.technopolis.films.api.TraktClientGenerator
 import android.technopolis.films.api.model.media.CalendarItem
+import android.technopolis.films.api.model.media.CommonMediaItem
 import android.technopolis.films.api.model.media.HistoryItem
 import android.technopolis.films.api.model.media.MediaType
-import android.technopolis.films.api.model.media.RecommendationItem
 import android.technopolis.films.api.model.media.SortType
 import android.technopolis.films.api.model.users.stats.UserStats
 import android.technopolis.films.api.model.media.Media
@@ -28,8 +28,8 @@ class MainRepository : Repository {
         _moviesRecommendationsLoading.asStateFlow()
 
     private val _moviesRecommendations =
-        MutableLiveData<MutableList<RecommendationItem>>(mutableListOf())
-    override val moviesRecommendations: Flow<MutableList<RecommendationItem>> =
+        MutableLiveData<MutableList<CommonMediaItem>>(mutableListOf())
+    override val moviesRecommendations: Flow<MutableList<CommonMediaItem>> =
         _moviesRecommendations.asFlow()
 
     /*____________________________________________________________________________________________*/
@@ -39,8 +39,8 @@ class MainRepository : Repository {
         _showsRecommendationsLoading.asStateFlow()
 
     private val _showsRecommendations =
-        MutableLiveData<MutableList<RecommendationItem>>(mutableListOf())
-    override val showsRecommendations: Flow<MutableList<RecommendationItem>> =
+        MutableLiveData<MutableList<CommonMediaItem>>(mutableListOf())
+    override val showsRecommendations: Flow<MutableList<CommonMediaItem>> =
         _showsRecommendations.asFlow()
 
     override fun getRecommendations(type: MediaType, ignoreCollected: Boolean) {
@@ -62,7 +62,7 @@ class MainRepository : Repository {
     private fun getRecommendations(
         type: MediaType,
         ignoreCollected: Boolean,
-        list: MutableLiveData<MutableList<RecommendationItem>>,
+        list: MutableLiveData<MutableList<CommonMediaItem>>,
         loadingState: MutableStateFlow<Boolean>,
     ) {
         MainScope().launch(Dispatchers.IO) {

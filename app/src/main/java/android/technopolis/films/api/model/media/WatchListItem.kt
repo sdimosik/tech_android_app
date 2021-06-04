@@ -4,7 +4,6 @@ import android.technopolis.films.api.model.media.movies.Movie
 import android.technopolis.films.api.model.media.shows.Show
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import java.time.LocalDateTime
 
 @Serializable
 data class WatchListItem(
@@ -13,7 +12,7 @@ data class WatchListItem(
     @SerialName("listed_at")
     val listedAt: String, //LocalDateTime,
     val notes: String? = null,
-    override val type: String,
+    override val type: MediaTypeResponse,
     override val movie: Movie? = null,
     override val show: Show? = null,
 ): Media

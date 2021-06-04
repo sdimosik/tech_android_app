@@ -1,22 +1,20 @@
 package android.technopolis.films.repository
 
 import android.technopolis.films.api.model.media.CalendarItem
+import android.technopolis.films.api.model.media.CommonMediaItem
 import android.technopolis.films.api.model.media.HistoryItem
 import android.technopolis.films.api.model.media.MediaType
-import android.technopolis.films.api.model.media.RecommendationItem
 import android.technopolis.films.api.model.users.stats.UserStats
 import android.technopolis.films.api.model.media.Media
 import android.technopolis.films.api.model.users.settings.UserSettings
-import androidx.lifecycle.MutableLiveData
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
 interface Repository {
     val moviesRecommendationsLoading: StateFlow<Boolean>
-    val moviesRecommendations: Flow<MutableList<RecommendationItem>>
+    val moviesRecommendations: Flow<MutableList<CommonMediaItem>>
     val showsRecommendationsLoading: StateFlow<Boolean>
-    val showsRecommendations: Flow<MutableList<RecommendationItem>>
+    val showsRecommendations: Flow<MutableList<CommonMediaItem>>
     fun getRecommendations(type: MediaType, ignoreCollected: Boolean)
 
     /*============================================================================================*/

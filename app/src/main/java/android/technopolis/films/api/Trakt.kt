@@ -1,9 +1,9 @@
 package android.technopolis.films.api
 
 import android.technopolis.films.api.model.media.CalendarItem
+import android.technopolis.films.api.model.media.CommonMediaItem
 import android.technopolis.films.api.model.media.HistoryItem
 import android.technopolis.films.api.model.media.MediaType
-import android.technopolis.films.api.model.media.RecommendationItem
 import android.technopolis.films.api.model.media.SortType
 import android.technopolis.films.api.model.media.WatchListItem
 import android.technopolis.films.api.model.users.settings.UserSettings
@@ -36,7 +36,7 @@ class Trakt(
         type: MediaType,
         limit: Int,
         ignoreCollected: Boolean,
-    ): Response<MutableList<RecommendationItem>> {
+    ): Response<MutableList<CommonMediaItem>> {
         return client.value!!.getRecommendations(type.name, limit, ignoreCollected)
     }
 

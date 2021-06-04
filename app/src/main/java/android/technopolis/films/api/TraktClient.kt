@@ -4,8 +4,8 @@ import android.technopolis.films.api.model.auth.GetNewTokenRequest
 import android.technopolis.films.api.model.auth.GetTokenRequest
 import android.technopolis.films.api.model.auth.GetTokenResponse
 import android.technopolis.films.api.model.media.CalendarItem
+import android.technopolis.films.api.model.media.CommonMediaItem
 import android.technopolis.films.api.model.media.HistoryItem
-import android.technopolis.films.api.model.media.RecommendationItem
 import android.technopolis.films.api.model.media.WatchListItem
 import android.technopolis.films.api.model.users.settings.UserSettings
 import android.technopolis.films.api.model.users.stats.UserStats
@@ -38,7 +38,7 @@ interface TraktClient {
         @Path("type") mediaType: String,
         @Query("limit") limit: Int,
         @Query("ignore_collected") ignoreCollected: Boolean?,
-    ): Response<MutableList<RecommendationItem>>
+    ): Response<MutableList<CommonMediaItem>>
 
     /**
      * @param id - user 'slug' of word 'me' if there is access_token in request headers
