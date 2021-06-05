@@ -12,232 +12,204 @@ import android.technopolis.films.api.model.media.Media
 import android.technopolis.films.api.model.users.settings.UserSettings
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.asFlow
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.withLock
+import okhttp3.internal.checkOffsetAndCount
 
 class MainRepository : Repository {
     private val client: Trakt = TraktClientGenerator.getClient()
+    private val config = Config()
 
-    private var _moviesRecommendationsLoading: MutableStateFlow<Boolean> = MutableStateFlow(false)
     override val moviesRecommendationsLoading: StateFlow<Boolean> =
-        _moviesRecommendationsLoading.asStateFlow()
-
-    private val _moviesRecommendations =
-        MutableLiveData<MutableList<CommonMediaItem>>(mutableListOf())
+        config.getConfig(MediaType.movies).recommendationsLoading.asStateFlow()
     override val moviesRecommendations: Flow<MutableList<CommonMediaItem>> =
-        _moviesRecommendations.asFlow()
+        config.getConfig(MediaType.movies).recommendations.asFlow()
 
     /*____________________________________________________________________________________________*/
 
-    private var _showsRecommendationsLoading: MutableStateFlow<Boolean> = MutableStateFlow(false)
     override val showsRecommendationsLoading: StateFlow<Boolean> =
-        _showsRecommendationsLoading.asStateFlow()
-
-    private val _showsRecommendations =
-        MutableLiveData<MutableList<CommonMediaItem>>(mutableListOf())
+        config.getConfig(MediaType.shows).recommendationsLoading.asStateFlow()
     override val showsRecommendations: Flow<MutableList<CommonMediaItem>> =
-        _showsRecommendations.asFlow()
+        config.getConfig(MediaType.shows).recommendations.asFlow()
 
     override fun getRecommendations(type: MediaType, ignoreCollected: Boolean) {
-        when (type) {
-            MediaType.movies -> getRecommendations(type,
-                ignoreCollected,
-                _moviesRecommendations,
-                _moviesRecommendationsLoading
-            )
-
-            MediaType.shows -> getRecommendations(type,
-                ignoreCollected,
-                _showsRecommendations,
-                _showsRecommendationsLoading
-            )
-        }
+        getRecommendations(type, ignoreCollected, config.getConfig(type))
     }
 
     private fun getRecommendations(
         type: MediaType,
         ignoreCollected: Boolean,
-        list: MutableLiveData<MutableList<CommonMediaItem>>,
-        loadingState: MutableStateFlow<Boolean>,
+        config: ConfigImpl,
     ) {
         MainScope().launch(Dispatchers.IO) {
-            loadingState.value = true
+            config.recommendationsLoading.value = true
             val recommendations = client.getRecommendations(
                 type,
                 RECOMMENDATIONS_LIMIT,
                 ignoreCollected,
             )
 
-            list.value!!.apply {
+            config.recommendations.value!!.apply {
                 addAll(size, recommendations)
             }
 
-            loadingState.value = false
+            config.recommendationsLoading.value = false
         }
     }
+
     /*============================================================================================*/
 
-    private var _moviesWatchListLoading: MutableStateFlow<Boolean> = MutableStateFlow(false)
-    override val moviesWatchListLoading: StateFlow<Boolean> = _moviesWatchListLoading.asStateFlow()
-
-    private val _moviesWatchList = MutableLiveData<MutableList<Media>>(mutableListOf())
-    override val moviesWatchList: Flow<MutableList<Media>> = _moviesWatchList.asFlow()
-
-    private var _currentMoviesWatchListPage = MutableStateFlow(0)
-    private var _isMoviesWatchListEnded = MutableStateFlow(false)
+    override val moviesWatchListLoading: StateFlow<Boolean> =
+        config.getConfig(MediaType.movies).watchListLoading.asStateFlow()
+    override val moviesWatchList: Flow<MutableList<Media>> =
+        config.getConfig(MediaType.movies).watchList.asFlow()
 
     /*____________________________________________________________________________________________*/
 
-    private var _showsWatchListLoading: MutableStateFlow<Boolean> = MutableStateFlow(false)
-    override val showsWatchListLoading: StateFlow<Boolean> = _showsWatchListLoading.asStateFlow()
-
-    private val _showsWatchList = MutableLiveData<MutableList<Media>>(mutableListOf())
-    override val showsWatchList: Flow<MutableList<Media>> = _showsWatchList.asFlow()
-    private var _currentShowsWatchListPage = MutableStateFlow(0)
-    private var _isShowsWatchListEnded = MutableStateFlow(false)
+    override val showsWatchListLoading: StateFlow<Boolean> =
+        config.getConfig(MediaType.shows).watchListLoading.asStateFlow()
+    override val showsWatchList: Flow<MutableList<Media>> =
+        config.getConfig(MediaType.shows).watchList.asFlow()
 
     /*____________________________________________________________________________________________*/
 
     override fun getWatchList(type: MediaType) {
-        when (type) {
-            MediaType.movies -> getWatchList(type,
-                "me",
-                _currentMoviesWatchListPage,
-                _moviesWatchList,
-                _moviesWatchListLoading,
-                _isMoviesWatchListEnded)
+        MainScope().launch(Dispatchers.IO) {
+            val c = config.getConfig(type)
+            if (c.watchListLoadingMutex.isLocked) {
+                println("getWatchList(): lock is busy. cant getWatchList")
+                cancel()
+            }
 
-            MediaType.shows -> getWatchList(type,
-                "me",
-                _currentShowsWatchListPage,
-                _showsWatchList,
-                _showsWatchListLoading,
-                _isShowsWatchListEnded)
+            c.watchListLoadingMutex.withLock {
+                getWatchList(type, c, "me")
+            }
+        }
+
+    }
+
+    override fun updateWatchList(type: MediaType) {
+        println("updateWatchList(): update")
+        val c = config.getConfig(type)
+        MainScope().launch {
+            if (c.watchListLoadingMutex.isLocked) {
+                c.watchListCancel.value = true
+                println("updateWatchList(): mutex is locked. try to unlock")
+            }
+
+            c.watchListLoadingMutex.withLock {
+                println("updateWatchList(): inside mutex")
+                c.watchListLoading.value = true
+                c.currentWatchListPage.value = 0
+                c.watchList.value = mutableListOf()
+                getWatchList(type, c, "me")
+                c.watchListCancel.value = false
+            }
         }
     }
 
     private fun getWatchList(
         type: MediaType,
+        config: ConfigImpl,
         id: String,
-        currentPage: MutableStateFlow<Int>,
-        list: MutableLiveData<MutableList<Media>>,
-        loadingState: MutableStateFlow<Boolean>,
-        isEnded: MutableStateFlow<Boolean>,
     ) {
-        if (isEnded.value) {
-            return
-        }
-        currentPage.value += 1
         MainScope().launch(Dispatchers.IO) {
-            loadingState.value = true
+            println("getWatchList(): try to get data")
+            if (config.isWatchListEnded.value) {
+                cancel()
+            }
+            setUpCancellation(config, this)
+            config.currentWatchListPage.value += 1
+
+            config.watchListLoading.value = true
             val watchList = client.getWatchList(
                 id,
                 type,
                 SortType.added,
-                currentPage.value,
+                config.currentWatchListPage.value,
                 LIMIT_ON_PAGE
             )
 
             if (watchList.size < LIMIT_ON_PAGE) {
-                isEnded.value = true
+                config.isWatchListEnded.value = true
             }
 
-            list.value!!.apply {
+            config.watchList.value!!.apply {
                 addAll(size, watchList)
             }
-            loadingState.value = false
+            println("getWatchList(): data loaded")
+            config.watchListLoading.value = false
         }
     }
 
-    override fun updateWatchList(type: MediaType) {
-        when (type) {
-            MediaType.movies -> {
-                _currentMoviesWatchListPage.value = 0
-                _moviesWatchList.value = mutableListOf()
-                getWatchList(type)
+    private fun setUpCancellation(config: ConfigImpl, coroutineScope: CoroutineScope) {
+        println("setUpCancellation() ${config.watchListCancel.value}")
+        config.watchListCancel.asStateFlow().onEach {
+        println("setUpCancellation() -> onEach")
+            if (it) {
+                println("cancel job")
+                coroutineScope.cancel()
             }
-            MediaType.shows -> {
-                _currentShowsWatchListPage.value = 0
-                _showsWatchList.value = mutableListOf()
-                getWatchList(type)
-            }
-        }
+        }.launchIn(coroutineScope)
     }
     /*============================================================================================*/
 
-    private var _moviesHistoryLoading: MutableStateFlow<Boolean> = MutableStateFlow(false)
-    override val moviesHistoryLoading: StateFlow<Boolean> = _moviesHistoryLoading.asStateFlow()
-
-    private val _moviesHistory = MutableLiveData<MutableList<HistoryItem>>(mutableListOf())
-    override val moviesHistory: Flow<MutableList<HistoryItem>> = _moviesHistory.asFlow()
-    private var _currentMoviesHistoryPage = MutableStateFlow(0)
-    private var _isMoviesHistoryEnded = MutableStateFlow(false)
+    override val moviesHistoryLoading: StateFlow<Boolean> =
+        config.getConfig(MediaType.movies).historyLoading.asStateFlow()
+    override val moviesHistory: Flow<MutableList<HistoryItem>> =
+        config.getConfig(MediaType.movies).history.asFlow()
 
     /*____________________________________________________________________________________________*/
 
-    private var _showsHistoryLoading: MutableStateFlow<Boolean> = MutableStateFlow(false)
-    override val showsHistoryLoading: StateFlow<Boolean> = _showsHistoryLoading.asStateFlow()
+    override val showsHistoryLoading: StateFlow<Boolean> =
+        config.getConfig(MediaType.shows).historyLoading.asStateFlow()
+    override val showsHistory: Flow<MutableList<HistoryItem>> =
+        config.getConfig(MediaType.shows).history.asFlow()
 
-    private val _showsHistory = MutableLiveData<MutableList<HistoryItem>>(mutableListOf())
-    override val showsHistory: Flow<MutableList<HistoryItem>> = _showsHistory.asFlow()
-    private var _currentShowsHistoryPage = MutableStateFlow(0)
-    private var _isShowsHistoryEnded = MutableStateFlow(false)
 
     override fun getWatchedHistory(type: MediaType) {
-        when (type) {
-            MediaType.movies -> getWatchedHistory(type,
-                "me",
-                _currentMoviesHistoryPage,
-                _moviesHistory,
-                _moviesHistoryLoading,
-                _isMoviesHistoryEnded)
-
-            MediaType.shows -> getWatchedHistory(type,
-                "me",
-                _currentShowsHistoryPage,
-                _showsHistory,
-                _showsHistoryLoading,
-                _isShowsHistoryEnded)
-        }
+        getWatchedHistory(type, "me", config.getConfig(type))
     }
 
     private fun getWatchedHistory(
         type: MediaType,
         id: String,
-        currentPage: MutableStateFlow<Int>,
-        list: MutableLiveData<MutableList<HistoryItem>>,
-        loadingState: MutableStateFlow<Boolean>,
-        isEnded: MutableStateFlow<Boolean>,
+        config: ConfigImpl,
     ) {
-        if (isEnded.value) {
+        if (config.isHistoryEnded.value) {
             return
         }
 
-        currentPage.value += 1
+        config.currentHistoryPage.value += 1
         MainScope().launch(Dispatchers.IO) {
-            loadingState.value = true
+            config.historyLoading.value = true
             val watchHistory = client.getWatchedHistory(id,
                 type,
-                currentPage.value,
+                config.currentHistoryPage.value,
                 LIMIT_ON_PAGE,
                 null,
                 null,
                 null)
 
             if (watchHistory.size < LIMIT_ON_PAGE) {
-                isEnded.value = true
+                config.isHistoryEnded.value = true
             }
 
-            list.value!!.apply {
+            config.history.value!!.apply {
                 addAll(size, watchHistory)
             }
         }
-        loadingState.value = false
+        config.historyLoading.value = false
     }
 
     /*============================================================================================*/
@@ -257,54 +229,39 @@ class MainRepository : Repository {
     }
     /*============================================================================================*/
 
-    private var _moviesCalendarLoading: MutableStateFlow<Boolean> = MutableStateFlow(false)
-    override val moviesCalendarLoading: StateFlow<Boolean> = _moviesCalendarLoading.asStateFlow()
-
-    private val _moviesCalendar = MutableLiveData<MutableList<CalendarItem>>(mutableListOf())
-    override val moviesCalendar: Flow<MutableList<CalendarItem>> = _moviesCalendar.asFlow()
+    override val moviesCalendarLoading: StateFlow<Boolean> =
+        config.getConfig(MediaType.movies).calendarLoading.asStateFlow()
+    override val moviesCalendar: Flow<MutableList<CalendarItem>> =
+        config.getConfig(MediaType.movies).calendar.asFlow()
 
     /*____________________________________________________________________________________________*/
 
-    private var _showsCalendarLoading: MutableStateFlow<Boolean> = MutableStateFlow(false)
-    override val showsCalendarLoading: StateFlow<Boolean> = _showsCalendarLoading.asStateFlow()
-
-    private val _showsCalendar = MutableLiveData<MutableList<CalendarItem>>(mutableListOf())
-    override val showsCalendar: Flow<MutableList<CalendarItem>> = _showsCalendar.asFlow()
+    override val showsCalendarLoading: StateFlow<Boolean> =
+        config.getConfig(MediaType.shows).calendarLoading.asStateFlow()
+    override val showsCalendar: Flow<MutableList<CalendarItem>> =
+        config.getConfig(MediaType.shows).calendar.asFlow()
 
     override fun getMyCalendar(
         type: MediaType,
         startDate: String,
         days: Int,
     ) {
-        when (type) {
-            MediaType.movies -> getMyCalendar(type,
-                startDate,
-                days,
-                _moviesCalendar,
-                _moviesCalendarLoading)
-
-            MediaType.shows -> getMyCalendar(type,
-                startDate,
-                days,
-                _showsCalendar,
-                _showsCalendarLoading)
-        }
+        getMyCalendar(type, startDate, days, config.getConfig(type))
     }
 
     private fun getMyCalendar(
         type: MediaType,
         startDate: String,
         days: Int,
-        list: MutableLiveData<MutableList<CalendarItem>>,
-        loadingState: MutableStateFlow<Boolean>,
+        config: ConfigImpl,
     ) {
         MainScope().launch(Dispatchers.IO) {
-            loadingState.value = true
+            config.calendarLoading.value = true
             val calendar = client.getMyCalendar(type, startDate, days)
-            list.value!!.apply {
+            config.calendar.value!!.apply {
                 addAll(size, calendar)
             }
-            loadingState.value = false
+            config.calendarLoading.value = false
         }
     }
 
