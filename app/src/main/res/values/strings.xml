@@ -9,4 +9,5 @@
 
     <string name="watch__tab_layout__film_tab_name">Films</string>
     <string name="watch__tab_layout__show_tab_name">Shows</string>
+    <string name="login">Login</string>
 </resources>
