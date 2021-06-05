@@ -1,5 +1,6 @@
 package android.technopolis.films.ui.watch.rvMediaHolder
 
+import android.technopolis.films.api.model.media.Media
 import android.technopolis.films.databinding.MediaHolderBinding
 import android.view.LayoutInflater
 import android.view.ViewGroup

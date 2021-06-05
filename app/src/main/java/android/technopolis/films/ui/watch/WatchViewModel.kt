@@ -1,13 +1,12 @@
 package android.technopolis.films.ui.watch
 
 import android.os.Bundle
+import android.technopolis.films.api.model.media.Media
 import android.technopolis.films.repository.MainRepository
 import android.technopolis.films.repository.Repository
-import android.technopolis.films.ui.watch.rvMediaHolder.Media
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asFlow
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -21,18 +20,8 @@ class WatchViewModel : ViewModel() {
 
     private val repository: Repository = MainRepository()
 
-    private val _medias: MutableLiveData<List<Media>> = MutableLiveData(
-        listOf(
-            Media(1),
-            Media(1),
-            Media(1),
-            Media(1),
-            Media(1),
-            Media(1),
-            Media(1),
-        )
-    )
-    val medias: LiveData<List<Media>> = _medias
+    private val _medias: Flow<MutableList<Media>> = repository.moviesWatchList
+    val medias: Flow<MutableList<Media>> = _medias
 
     fun onPageChanged(savedState: Bundle) {
         tabArgs.putAll(savedState)
