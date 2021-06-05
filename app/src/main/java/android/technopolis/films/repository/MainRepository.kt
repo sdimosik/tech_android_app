@@ -16,6 +16,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -25,6 +26,7 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.withLock
 import okhttp3.internal.checkOffsetAndCount
+import okhttp3.internal.wait
 
 class MainRepository : Repository {
     private val client: Trakt = TraktClientGenerator.getClient()
@@ -100,8 +102,8 @@ class MainRepository : Repository {
 
     override fun updateWatchList(type: MediaType) {
         println("updateWatchList(): update")
-        val c = config.getConfig(type)
         MainScope().launch {
+            val c = config.getConfig(type)
             if (c.watchListLoadingMutex.isLocked) {
                 c.watchListCancel.value = true
                 println("updateWatchList(): mutex is locked. try to unlock")
@@ -109,7 +111,7 @@ class MainRepository : Repository {
 
             c.watchListLoadingMutex.withLock {
                 println("updateWatchList(): inside mutex")
-                c.watchListLoading.value = true
+                c.isWatchListEnded.value = false
                 c.currentWatchListPage.value = 0
                 c.watchList.value = mutableListOf()
                 getWatchList(type, c, "me")
