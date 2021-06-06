@@ -1,6 +1,7 @@
 package android.technopolis.films.ui.feed
 
-import android.technopolis.films.databinding.FeedAdapterBinding
+import android.technopolis.films.api.model.media.CommonMediaItem
+import android.technopolis.films.databinding.FeedSubAdapterItemBinding
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.AsyncListDiffer
@@ -8,41 +9,47 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 
-class Holder(
-    private val itemBinding: FeedAdapterBinding
+class FeedAdapterHolder(
+    private val itemBinding: FeedSubAdapterItemBinding
 ) : RecyclerView.ViewHolder(itemBinding.root) {
 
-    fun bindTo(item: FeedItemModel) {
+    fun bindTo(item: CommonMediaItem) {
         itemView.apply {
-            itemBinding.name.text = item.name
-            itemBinding.someInfo.text = item.someInfo
+            if (true) {
+                itemBinding.name.text = item.title
+                itemBinding.someInfo.text = item.year.toString()
+            } else {
+                itemBinding.name.text = item.title
+                itemBinding.someInfo.text = item.year.toString()
+            }
         }
     }
 }
 
 private val differCallback = object :
-    DiffUtil.ItemCallback<FeedItemModel>() {
+    DiffUtil.ItemCallback<CommonMediaItem>() {
     override fun areItemsTheSame(
-        oldItem: FeedItemModel,
-        newItem: FeedItemModel
+        oldItem: CommonMediaItem,
+        newItem: CommonMediaItem
     ): Boolean {
-        return oldItem.id == newItem.id
+        return oldItem.ids.trakt == newItem.ids.trakt
     }
 
     override fun areContentsTheSame(
-        oldItem: FeedItemModel,
-        newItem: FeedItemModel
+        oldItem: CommonMediaItem,
+        newItem: CommonMediaItem
     ): Boolean {
         return oldItem == newItem
     }
 }
 
-class FeedAdapter : ListAdapter<FeedItemModel, Holder>(differCallback) {
+class FeedAdapter : ListAdapter<CommonMediaItem, FeedAdapterHolder>(differCallback) {
+
     val differ = AsyncListDiffer(this, differCallback)
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): Holder {
-        return Holder(
-            FeedAdapterBinding.inflate(
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FeedAdapterHolder {
+        return FeedAdapterHolder(
+            FeedSubAdapterItemBinding.inflate(
                 LayoutInflater.from(parent.context),
                 parent,
                 false
@@ -50,9 +57,9 @@ class FeedAdapter : ListAdapter<FeedItemModel, Holder>(differCallback) {
         )
     }
 
-    override fun onBindViewHolder(holder: Holder, position: Int) {
+    override fun onBindViewHolder(feedAdapterHolder: FeedAdapterHolder, position: Int) {
         val current = differ.currentList[position]
-        holder.bindTo(current)
+        feedAdapterHolder.bindTo(current)
     }
 
     override fun getItemCount(): Int {

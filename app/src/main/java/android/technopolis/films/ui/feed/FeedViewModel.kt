@@ -1,39 +1,93 @@
 package android.technopolis.films.ui.feed
 
+import android.os.Bundle
+import android.os.Parcelable
+import android.technopolis.films.api.model.media.MediaType
 import android.technopolis.films.repository.MainRepository
+import android.widget.SearchView
 import androidx.lifecycle.ViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 
 class FeedViewModel(
     private val mainRepository: MainRepository
 ) : ViewModel() {
 
-    private val _text = MutableStateFlow("This is feed Fragment")
-    val text: StateFlow<String> = _text.asStateFlow()
+    private var positionMovie: Parcelable? = null
+    private var isLoadMovie = false
 
-    private val tempList = MutableStateFlow(
-        listOf(
-            FeedItemModel("1", "url", "qwe", "qweqweqweqwe"),
-            FeedItemModel("2", "url", "aaaa", "asdadasdasdsdsd"),
-            FeedItemModel("3", "url", "qwewqewew", "qweweqweqeqweqee"),
-            FeedItemModel("4", "url", "we", "wewewqeqwe"),
-            FeedItemModel("5", "url", "wewewqewqwe", "weqweqwe"),
-            FeedItemModel("6", "url", "ghhhh", "hhhhh"),
-            FeedItemModel("7", "url", "tr", "rtetert"),
-            FeedItemModel("8", "url", "q", "poui"),
-            FeedItemModel("9", "url", "mnb", "mnbmbmbnm"),
-            FeedItemModel("10", "url", "nb", "xvxvxv"),
-            FeedItemModel("11", "url", "sda", "fgftrertert"),
-            FeedItemModel("12", "url", "tyuio", "wqewqe"),
-            FeedItemModel("13", "url", "sdasds", "sd,nbv"),
-            FeedItemModel("14", "url", "xczzcxc", ",m,bnbbnbn"),
-            FeedItemModel("15", "url", "wqe11", "123125124"),
-        )
-    )
+    private var positionShow: Parcelable? = null
+    private var isLoadShow = false
 
-    fun observeFavoriteList(): StateFlow<List<FeedItemModel>> {
-        return tempList
+    private var positionViewPager: Int? = 0
+
+    fun saveStateMovie(savedState: Parcelable?) {
+        positionMovie = savedState
     }
+
+    fun getStateMovie(): Parcelable? {
+        return positionMovie
+    }
+
+    fun saveStateShow(savedState: Parcelable?) {
+        positionShow = savedState
+    }
+
+    fun getStateShow(): Parcelable? {
+        return positionShow
+    }
+
+    fun saveStateViewPager(savedState: Int?) {
+        positionViewPager = savedState
+    }
+
+    fun getStateViewPager(): Int? {
+        return positionViewPager
+    }
+
+    fun updateRecommendationsMovies() {
+        mainRepository.getRecommendations(MediaType.movies, false)
+        isLoadMovie = true
+    }
+
+    fun isLoadMovie() = isLoadMovie
+
+    fun moviesRecommendations() = mainRepository.moviesRecommendations
+
+    fun updateRecommendationsShows() {
+        mainRepository.getRecommendations(MediaType.shows, false)
+        isLoadShow = true
+    }
+
+    fun isLoadShow() = isLoadShow
+
+    fun showsRecommendations() = mainRepository.showsRecommendations
+
+    // TODO SearchView
+    /*fun filterList(term: String, adapter: FeedAdapter) {
+        if (term.isNotEmpty()) {
+            val list = adapter.originalList.filter { it.name?.contains(term, true)!! }
+            adapter.filterList = list
+            adapter.notifyDataSetChanged()
+
+        } else {
+            adapter.filterList = adapter.originalList
+            adapter.notifyDataSetChanged()
+        }
+    }
+
+    fun getOnQueryTextChange(adapter: FeedAdapter): SearchView.OnQueryTextListener =
+        object : SearchView.OnQueryTextListener {
+            override fun onQueryTextChange(term: String?): Boolean {
+                if (term != null) {
+                    filterList(term, adapter)
+                }
+                return false
+            }
+
+            override fun onQueryTextSubmit(term: String?): Boolean {
+                if (term != null) {
+                    filterList(term, adapter)
+                }
+                return false
+            }
+        }*/
 }
