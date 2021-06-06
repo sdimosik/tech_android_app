@@ -26,9 +26,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -41,9 +39,7 @@ class ListFragment : Fragment() {
     private val listAdapter: MediaAdapter by lazy { MediaAdapter() }
     private var tabType: MediaType? = null
     private var ARGS_TAG: String? = null
-    private val myNetworkCallback by lazy { MyNetworkCallback() }
-    private var networkState: MutableStateFlow<Boolean> = MutableStateFlow(false)
-    private var networkStateFlow: StateFlow<Boolean> = networkState.asStateFlow()
+    private lateinit var networkState: StateFlow<Boolean>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -63,7 +59,6 @@ class ListFragment : Fragment() {
     private val onScrollListener: OnScrollListener by lazy { OnScrollListener() }
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        registerConnectivityCallback()
         setupRecyclerView()
         val mediaListRecyclerView = binding?.mediaListRecyclerView
 
@@ -84,7 +79,6 @@ class ListFragment : Fragment() {
         if (noConnectionSandbar.isShown) {
             noConnectionSandbar.dismiss()
         }
-        unregisterConnectivityCallback()
         binding?.mediaListRecyclerView?.removeOnScrollListener(onScrollListener)
         binding = null
     }
@@ -109,6 +103,26 @@ class ListFragment : Fragment() {
             adapter = listAdapter
         }
 
+        val navView = (activity as MainActivity).findViewById<View>(R.id.nav_view)
+        noConnectionSandbar = Snackbar.make(binding?.swipeRefreshLayout!!,
+            resources.getString(R.string.no_connection),
+            Snackbar.LENGTH_INDEFINITE)
+            .setAnchorView(navView)
+            .setBackgroundTint(resources.getColor(R.color.bad_connection_snackar_background))
+            .setTextColor(resources.getColor(R.color.bad_connection_snackar_text))
+
+        networkState = viewModel.networkState
+        if (!networkState.value) {
+            noConnectionSandbar.show()
+        }
+        networkState.onEach {
+            if (!it) {
+                noConnectionSandbar.show()
+            } else if (noConnectionSandbar.isShown) {
+                noConnectionSandbar.dismiss()
+            }
+        }.launchIn(MainScope())
+
         val medias = viewModel.observeList(tabType!!)
         getMoreData()
         medias.onEach {
@@ -117,32 +131,12 @@ class ListFragment : Fragment() {
 
         val status = viewModel.observeListStatus(tabType!!)
 
-        val navView = (activity as MainActivity).findViewById<View>(R.id.nav_view)
         badConnectionSandbar = Snackbar.make(binding?.swipeRefreshLayout!!,
             resources.getString(R.string.bad_connection),
             Snackbar.LENGTH_INDEFINITE)
             .setAnchorView(navView)
             .setBackgroundTint(resources.getColor(R.color.bad_connection_snackar_background))
             .setTextColor(resources.getColor(R.color.bad_connection_snackar_text))
-
-        noConnectionSandbar = Snackbar.make(binding?.swipeRefreshLayout!!,
-            resources.getString(R.string.no_connection),
-            Snackbar.LENGTH_INDEFINITE)
-            .setAnchorView(navView)
-            .setBackgroundTint(resources.getColor(R.color.bad_connection_snackar_background))
-            .setTextColor(resources.getColor(R.color.bad_connection_snackar_text))
-
-        if (!networkState.value) {
-            noConnectionSandbar.show()
-        }
-        networkStateFlow.onEach {
-            println(it)
-            if (!it) {
-                noConnectionSandbar.show()
-            } else if (noConnectionSandbar.isShown) {
-                noConnectionSandbar.dismiss()
-            }
-        }.launchIn(MainScope())
 
         status.onEach {
             if (it) {
@@ -190,14 +184,12 @@ class ListFragment : Fragment() {
 
     private fun getMoreData() {
         if (networkState.value) {
-            println("in")
             viewModel.getMoreData(tabType!!)
         }
     }
 
     private fun updateData() {
         if (networkState.value) {
-            println("in")
             viewModel.updateList(tabType!!)
         }
     }
@@ -214,7 +206,6 @@ class ListFragment : Fragment() {
                 }
                 var prev = true
                 viewModel.observeListStatus(tabType!!).onEach {
-                    println(it)
                     if (it) {
                         prev = !prev
                     }
@@ -225,33 +216,6 @@ class ListFragment : Fragment() {
                 }.launchIn(this)
             }
         }
-    }
-
-    inner class MyNetworkCallback : ConnectivityManager.NetworkCallback() {
-        override fun onAvailable(network: Network) {
-            super.onAvailable(network)
-            println("onAvailable")
-            networkState.value = true
-        }
-
-        override fun onLost(network: Network) {
-            super.onLost(network)
-            println("onLost")
-            networkState.value = false
-        }
-    }
-
-    private fun registerConnectivityCallback() {
-        val cm = context?.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        val builder = NetworkRequest.Builder().build()
-        cm.registerNetworkCallback(builder, myNetworkCallback)
-    }
-
-    private fun unregisterConnectivityCallback() {
-        val cm = context?.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        cm.unregisterNetworkCallback(
-            myNetworkCallback
-        )
     }
 
     companion object {

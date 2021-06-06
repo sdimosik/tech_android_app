@@ -18,9 +18,14 @@ class WatchViewModel : ViewModel() {
     private val _text = MutableStateFlow("This is watch Fragment")
     val text: StateFlow<String> = _text.asStateFlow()
 
+    private var _networkState: MutableStateFlow<Boolean> = MutableStateFlow(false)
+    var networkState = _networkState.asStateFlow()
+
+
     private val repository: Repository = MainRepository()
 
     fun getMoreData(type: MediaType) {
+        println("get more data $type")
         repository.getWatchList(type)
     }
 
@@ -57,5 +62,9 @@ class WatchViewModel : ViewModel() {
 
     fun updateList(type: MediaType) {
         repository.updateWatchList(type)
+    }
+
+    fun setNetworkState(state: Boolean) {
+        _networkState.value = state
     }
 }

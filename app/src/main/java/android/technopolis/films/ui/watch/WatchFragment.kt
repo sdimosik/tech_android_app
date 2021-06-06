@@ -1,28 +1,29 @@
 package android.technopolis.films.ui.watch
 
+import android.content.Context
+import android.net.ConnectivityManager
+import android.net.Network
+import android.net.NetworkRequest
 import android.os.Build
 import android.os.Bundle
 import android.technopolis.films.databinding.FragmentWatchBinding
-import android.technopolis.films.ui.watch.tabs.ListFragment
 import android.technopolis.films.ui.watch.tabs.WatchTabLayoutAdapter
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.RequiresApi
-import androidx.core.view.children
 import androidx.core.view.get
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentPagerAdapter
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-import androidx.viewpager.widget.ViewPager
 import com.google.android.material.tabs.TabLayout
 
 class WatchFragment : Fragment() {
     private var binding: FragmentWatchBinding? = null
 
     private val watchViewModel: WatchViewModel by activityViewModels()
+    private val myNetworkCallback by lazy { MyNetworkCallback() }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -37,6 +38,7 @@ class WatchFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        registerConnectivityCallback()
         val adapter = WatchTabLayoutAdapter(childFragmentManager, 0)
 
         val viewPager = binding?.fragmentWatchViewPager!!
@@ -53,6 +55,7 @@ class WatchFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
+        unregisterConnectivityCallback()
         binding = null
     }
 
@@ -85,6 +88,29 @@ class WatchFragment : Fragment() {
                 }
             }
         }
+    }
+
+    inner class MyNetworkCallback : ConnectivityManager.NetworkCallback() {
+        override fun onAvailable(network: Network) {
+            super.onAvailable(network)
+            watchViewModel.setNetworkState(true)
+        }
+
+        override fun onLost(network: Network) {
+            super.onLost(network)
+            watchViewModel.setNetworkState(false)
+        }
+    }
+
+    private fun registerConnectivityCallback() {
+        val cm = context?.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val builder = NetworkRequest.Builder().build()
+        cm.registerNetworkCallback(builder, myNetworkCallback)
+    }
+
+    private fun unregisterConnectivityCallback() {
+        val cm = context?.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        cm.unregisterNetworkCallback(myNetworkCallback)
     }
 
     companion object {

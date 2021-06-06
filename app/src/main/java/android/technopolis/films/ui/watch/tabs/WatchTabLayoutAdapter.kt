@@ -7,7 +7,7 @@ import androidx.fragment.app.FragmentPagerAdapter
 
 class WatchTabLayoutAdapter(
     fm: FragmentManager,
-    behavior: Int
+    behavior: Int,
 ) : FragmentPagerAdapter(fm, behavior) {
 
     private val names = MediaType.values()
