@@ -1,0 +1,18 @@
+<resources>
+    <string name="app_name">Films</string>
+
+    <string name="title_watch">Watch</string>
+    <string name="title_calendar">Calendar</string>
+    <string name="title_feed">Feed</string>
+    <string name="title_history">History</string>
+    <string name="title_profile">Profile</string>
+
+    <string name="watch__tab_layout__film_tab_name">Фильмы</string>
+    <string name="watch__tab_layout__show_tab_name">Сериалы</string>
+
+    <string name="watch__empty_list">Список пуст.</string>
+
+    <string name="bad_connection">Плохое интернет-соедниение.</string>
+    <string name="no_connection">Нет интернет-соединения.</string>
+
+</resources>
