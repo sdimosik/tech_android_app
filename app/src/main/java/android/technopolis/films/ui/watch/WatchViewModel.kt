@@ -25,7 +25,6 @@ class WatchViewModel : ViewModel() {
     private val repository: Repository = MainRepository()
 
     fun getMoreData(type: MediaType) {
-        println("get more data $type")
         repository.getWatchList(type)
     }
 

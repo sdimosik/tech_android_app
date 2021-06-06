@@ -1,9 +1,5 @@
 package android.technopolis.films.ui.watch.tabs
 
-import android.content.Context
-import android.net.ConnectivityManager
-import android.net.Network
-import android.net.NetworkRequest
 import android.os.Bundle
 import android.os.Parcelable
 import android.technopolis.films.R
