@@ -2,14 +2,9 @@ package android.technopolis.films.repository
 
 import android.technopolis.films.api.Trakt
 import android.technopolis.films.api.TraktClientGenerator
-import android.technopolis.films.api.model.media.CalendarItem
-import android.technopolis.films.api.model.media.CommonMediaItem
-import android.technopolis.films.api.model.media.HistoryItem
-import android.technopolis.films.api.model.media.MediaType
-import android.technopolis.films.api.model.media.SortType
-import android.technopolis.films.api.model.users.stats.UserStats
-import android.technopolis.films.api.model.media.Media
+import android.technopolis.films.api.model.media.*
 import android.technopolis.films.api.model.users.settings.UserSettings
+import android.technopolis.films.api.model.users.stats.UserStats
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.asFlow
 import kotlinx.coroutines.CoroutineScope
@@ -28,7 +23,9 @@ import kotlinx.coroutines.sync.withLock
 import okhttp3.internal.checkOffsetAndCount
 import okhttp3.internal.wait
 
+
 class MainRepository : Repository {
+
     private val client: Trakt = TraktClientGenerator.getClient()
     private val config = Config()
 
@@ -61,9 +58,7 @@ class MainRepository : Repository {
                 ignoreCollected,
             )
 
-            config.recommendations.value!!.apply {
-                addAll(size, recommendations)
-            }
+            config.recommendations.postValue(recommendations)
 
             config.recommendationsLoading.value = false
         }
@@ -157,7 +152,7 @@ class MainRepository : Repository {
     private fun setUpCancellation(config: ConfigImpl, coroutineScope: CoroutineScope) {
         println("setUpCancellation() ${config.watchListCancel.value}")
         config.watchListCancel.asStateFlow().onEach {
-        println("setUpCancellation() -> onEach")
+            println("setUpCancellation() -> onEach")
             if (it) {
                 println("cancel job")
                 coroutineScope.cancel()
@@ -195,13 +190,15 @@ class MainRepository : Repository {
         config.currentHistoryPage.value += 1
         MainScope().launch(Dispatchers.IO) {
             config.historyLoading.value = true
-            val watchHistory = client.getWatchedHistory(id,
+            val watchHistory = client.getWatchedHistory(
+                id,
                 type,
                 config.currentHistoryPage.value,
                 LIMIT_ON_PAGE,
                 null,
                 null,
-                null)
+                null
+            )
 
             if (watchHistory.size < LIMIT_ON_PAGE) {
                 config.isHistoryEnded.value = true

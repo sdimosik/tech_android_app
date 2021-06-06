@@ -14,4 +14,10 @@
 
     <string name="bad_connection">Bad internet connection.</string>
     <string name="no_connection">No internet connection.</string>
+
+    <!-- FeedFragment -->
+    <string name="feed_name_item">Name</string>
+    <string name="feed_someInfo_item">SomeInfo</string>
+    <string name="feed_type_item">Type</string>
+    <string name="feed_rating_item">Rating</string>
 </resources>
