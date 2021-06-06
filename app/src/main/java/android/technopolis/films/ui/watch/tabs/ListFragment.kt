@@ -1,5 +1,9 @@
 package android.technopolis.films.ui.watch.tabs
 
+import android.content.Context
+import android.net.ConnectivityManager
+import android.net.Network
+import android.net.NetworkRequest
 import android.os.Bundle
 import android.os.Parcelable
 import android.technopolis.films.R
@@ -8,13 +12,11 @@ import android.technopolis.films.databinding.FragmentListBinding
 import android.technopolis.films.ui.base.MainActivity
 import android.technopolis.films.ui.watch.WatchViewModel
 import android.technopolis.films.ui.watch.rvMediaHolder.MediaAdapter
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -24,6 +26,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -36,6 +39,8 @@ class ListFragment : Fragment() {
     private val listAdapter: MediaAdapter by lazy { MediaAdapter() }
     private var tabType: MediaType? = null
     private var ARGS_TAG: String? = null
+    private val myNetworkCallback by lazy { MyNetworkCallback() }
+    var networkState: MutableStateFlow<Boolean> = MutableStateFlow(false)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -55,7 +60,7 @@ class ListFragment : Fragment() {
     private val onScrollListener: OnScrollListener by lazy { OnScrollListener() }
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
+        registerConnectivityCallback()
         setupRecyclerView()
         val mediaListRecyclerView = binding?.mediaListRecyclerView
 
@@ -73,6 +78,7 @@ class ListFragment : Fragment() {
         if (badConnectionSandbar.isShown) {
             badConnectionSandbar.dismiss()
         }
+        unregisterConnectivityCallback()
         binding?.mediaListRecyclerView?.removeOnScrollListener(onScrollListener)
         binding = null
     }
@@ -97,6 +103,7 @@ class ListFragment : Fragment() {
         }
 
         val medias = viewModel.observeList(tabType!!)
+        getMoreData()
         medias.onEach {
             listAdapter.submitList(it)
         }.launchIn(MainScope())
@@ -104,7 +111,7 @@ class ListFragment : Fragment() {
         val status = viewModel.observeListStatus(tabType!!)
 
         badConnectionSandbar = Snackbar.make(binding?.swipeRefreshLayout!!,
-            "Bad Internet Connection",
+            resources.getString(R.string.bad_connection),
             Snackbar.LENGTH_INDEFINITE)
             .setAnchorView((activity as MainActivity).findViewById(R.id.nav_view))
             .setBackgroundTint(resources.getColor(R.color.bad_connection_snackar_background))
@@ -112,7 +119,6 @@ class ListFragment : Fragment() {
 
         status.onEach {
             if (it) {
-                Log.d("INFO", "${this.javaClass}: setupRecyclerView() LOADING")
                 MainScope().launch {
                     delay(TIME_TO_BAD_CONNECTION_NOTIFICATION)
                     if (status.value) {
@@ -121,9 +127,20 @@ class ListFragment : Fragment() {
                 }
             } else {
                 listAdapter.notifyDataSetChanged()
+                showList(listAdapter.currentList.isEmpty())
                 badConnectionSandbar.dismiss()
             }
         }.launchIn(MainScope())
+    }
+
+    private fun showList(isEmpty: Boolean) {
+        if (isEmpty) {
+            binding?.mediaListRecyclerView?.visibility = View.GONE
+            binding?.mediaListEmptyList?.visibility = View.VISIBLE
+        } else {
+            binding?.mediaListRecyclerView?.visibility = View.VISIBLE
+            binding?.mediaListEmptyList?.visibility = View.GONE
+        }
     }
 
     inner class OnScrollListener : RecyclerView.OnScrollListener() {
@@ -139,16 +156,35 @@ class ListFragment : Fragment() {
             val pos = linearLayoutManager.findLastCompletelyVisibleItemPosition()
             val last = recyclerView.adapter!!.itemCount
             if ((pos == last - 1) && (last != 0)) {
-                viewModel.getMoreData(tabType!!)
+                getMoreData()
             }
+        }
+    }
+
+    private fun getMoreData() {
+        if (networkState.value) {
+            println("in")
+            viewModel.getMoreData(tabType!!)
+        }
+    }
+
+    private fun updateData() {
+        if (networkState.value) {
+            println("in")
+            viewModel.updateList(tabType!!)
         }
     }
 
     inner class OnRefreshListener : SwipeRefreshLayout.OnRefreshListener {
         override fun onRefresh() {
             MainScope().launch(Dispatchers.Unconfined) {
-                binding?.swipeRefreshLayout?.isRefreshing = true
-                viewModel.updateList(tabType!!)
+                val swipeRefreshLayout = binding?.swipeRefreshLayout
+                swipeRefreshLayout?.isRefreshing = true
+                updateData()
+                if(!networkState.value){
+                    swipeRefreshLayout?.isRefreshing = false
+                    cancel()
+                }
                 var prev = true
                 viewModel.observeListStatus(tabType!!).onEach {
                     println(it)
@@ -156,7 +192,7 @@ class ListFragment : Fragment() {
                         prev = !prev
                     }
                     if (it == prev) {
-                        binding?.swipeRefreshLayout?.isRefreshing = false
+                        swipeRefreshLayout?.isRefreshing = false
                         cancel()
                     }
                 }.launchIn(this)
@@ -164,9 +200,34 @@ class ListFragment : Fragment() {
         }
     }
 
+    inner class MyNetworkCallback : ConnectivityManager.NetworkCallback() {
+        override fun onAvailable(network: Network) {
+            super.onAvailable(network)
+            networkState.value = true
+        }
+
+        override fun onLost(network: Network) {
+            super.onLost(network)
+            networkState.value = false
+        }
+    }
+
+    private fun registerConnectivityCallback() {
+        val cm = context?.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val builder = NetworkRequest.Builder().build()
+        cm.registerNetworkCallback(builder, myNetworkCallback)
+    }
+
+    private fun unregisterConnectivityCallback() {
+        val cm = context?.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        cm.unregisterNetworkCallback(
+            myNetworkCallback
+        )
+    }
+
     companion object {
         const val TAB_TYPE_TAG = "TAB_TYPE"
-        const val TIME_TO_BAD_CONNECTION_NOTIFICATION = 4000L
+        const val TIME_TO_BAD_CONNECTION_NOTIFICATION = 10_000L
 
         fun newInstance(type: MediaType): ListFragment {
             val listFragment = ListFragment()

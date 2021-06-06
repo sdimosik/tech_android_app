@@ -5,7 +5,6 @@ import android.technopolis.films.api.model.media.Media
 import android.technopolis.films.api.model.media.MediaType
 import android.technopolis.films.repository.MainRepository
 import android.technopolis.films.repository.Repository
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -19,15 +18,9 @@ class WatchViewModel : ViewModel() {
     private val _text = MutableStateFlow("This is watch Fragment")
     val text: StateFlow<String> = _text.asStateFlow()
 
-    private val repository: Repository by lazy {
-        val mainRepository = MainRepository()
-        mainRepository.getWatchList(MediaType.movies)
-        mainRepository.getWatchList(MediaType.shows)
-        mainRepository
-    }
+    private val repository: Repository = MainRepository()
 
     fun getMoreData(type: MediaType) {
-        Log.d("INFO","${this.javaClass}: getMoreData(): $type")
         repository.getWatchList(type)
     }
 
