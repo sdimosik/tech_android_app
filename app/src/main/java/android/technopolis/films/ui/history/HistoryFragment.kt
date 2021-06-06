@@ -3,6 +3,7 @@ package android.technopolis.films.ui.history
 import android.os.Bundle
 import android.technopolis.films.R
 import android.technopolis.films.databinding.FragmentFeedBinding
+import android.technopolis.films.databinding.FragmentHistoryBinding
 import android.technopolis.films.ui.base.MainActivity
 import android.view.LayoutInflater
 import android.view.View
@@ -14,7 +15,7 @@ import kotlinx.coroutines.flow.onEach
 
 class HistoryFragment : Fragment(R.layout.fragment_history) {
 
-    private var _binding: FragmentFeedBinding? = null;
+    private var _binding: FragmentHistoryBinding? = null
     private val binding get() = _binding!!
 
     private lateinit var historyViewModel: HistoryViewModel
@@ -24,7 +25,7 @@ class HistoryFragment : Fragment(R.layout.fragment_history) {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentFeedBinding.inflate(
+        _binding = FragmentHistoryBinding.inflate(
             inflater, container, false
         )
 
@@ -38,7 +39,7 @@ class HistoryFragment : Fragment(R.layout.fragment_history) {
 
         historyViewModel.text
             .onEach { text ->
-                binding.textFeed.text = text
+                binding.textHistory.text = text
             }
             .launchIn(lifecycleScope)
     }

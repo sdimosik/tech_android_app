@@ -2,20 +2,16 @@ package android.technopolis.films.repository
 
 import android.technopolis.films.api.Trakt
 import android.technopolis.films.api.TraktClientGenerator
-import android.technopolis.films.api.model.media.CalendarItem
-import android.technopolis.films.api.model.media.CommonMediaItem
-import android.technopolis.films.api.model.media.HistoryItem
-import android.technopolis.films.api.model.media.MediaType
-import android.technopolis.films.api.model.media.SortType
-import android.technopolis.films.api.model.users.stats.UserStats
-import android.technopolis.films.api.model.media.Media
+import android.technopolis.films.api.model.media.*
 import android.technopolis.films.api.model.users.settings.UserSettings
+import android.technopolis.films.api.model.users.stats.UserStats
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.asFlow
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -25,8 +21,11 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.withLock
 import okhttp3.internal.checkOffsetAndCount
+import okhttp3.internal.wait
+
 
 class MainRepository : Repository {
+
     private val client: Trakt = TraktClientGenerator.getClient()
     private val config = Config()
 
@@ -59,9 +58,7 @@ class MainRepository : Repository {
                 ignoreCollected,
             )
 
-            config.recommendations.value!!.apply {
-                addAll(size, recommendations)
-            }
+            config.recommendations.postValue(recommendations)
 
             config.recommendationsLoading.value = false
         }
@@ -100,8 +97,8 @@ class MainRepository : Repository {
 
     override fun updateWatchList(type: MediaType) {
         println("updateWatchList(): update")
-        val c = config.getConfig(type)
         MainScope().launch {
+            val c = config.getConfig(type)
             if (c.watchListLoadingMutex.isLocked) {
                 c.watchListCancel.value = true
                 println("updateWatchList(): mutex is locked. try to unlock")
@@ -109,7 +106,7 @@ class MainRepository : Repository {
 
             c.watchListLoadingMutex.withLock {
                 println("updateWatchList(): inside mutex")
-                c.watchListLoading.value = true
+                c.isWatchListEnded.value = false
                 c.currentWatchListPage.value = 0
                 c.watchList.value = mutableListOf()
                 getWatchList(type, c, "me")
