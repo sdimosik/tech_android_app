@@ -155,7 +155,7 @@ class MainRepository : Repository {
     private fun setUpCancellation(config: ConfigImpl, coroutineScope: CoroutineScope) {
         println("setUpCancellation() ${config.watchListCancel.value}")
         config.watchListCancel.asStateFlow().onEach {
-        println("setUpCancellation() -> onEach")
+            println("setUpCancellation() -> onEach")
             if (it) {
                 println("cancel job")
                 coroutineScope.cancel()
@@ -193,13 +193,15 @@ class MainRepository : Repository {
         config.currentHistoryPage.value += 1
         MainScope().launch(Dispatchers.IO) {
             config.historyLoading.value = true
-            val watchHistory = client.getWatchedHistory(id,
+            val watchHistory = client.getWatchedHistory(
+                id,
                 type,
                 config.currentHistoryPage.value,
                 LIMIT_ON_PAGE,
                 null,
                 null,
-                null)
+                null
+            )
 
             if (watchHistory.size < LIMIT_ON_PAGE) {
                 config.isHistoryEnded.value = true
@@ -276,7 +278,7 @@ class MainRepository : Repository {
     override fun getUserSettings() {
         MainScope().launch(Dispatchers.IO) {
             _userSettingsLoading.value = true
-            _userSettings.value = client.getUserSettings()
+            _userSettings.postValue(client.getUserSettings())
             _userSettingsLoading.value = false
         }
     }

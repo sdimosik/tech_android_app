@@ -40,4 +40,8 @@ class ProfileViewModel(
     fun observeFavoriteList(): StateFlow<List<FavoriteInProfileItemModel>> {
         return tempList
     }
+
+    fun updateUserSetting() = mainRepository.getUserSettings()
+
+    fun getUserSetting() = mainRepository.userSettings
 }
