@@ -2,8 +2,10 @@ package android.technopolis.films.ui.watch.tabs
 
 import android.os.Bundle
 import android.os.Parcelable
+import android.technopolis.films.R
 import android.technopolis.films.api.model.media.MediaType
 import android.technopolis.films.databinding.FragmentListBinding
+import android.technopolis.films.ui.base.MainActivity
 import android.technopolis.films.ui.watch.WatchViewModel
 import android.technopolis.films.ui.watch.rvMediaHolder.MediaAdapter
 import android.util.Log
@@ -17,9 +19,11 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -66,7 +70,9 @@ class ListFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
-
+        if (badConnectionSandbar.isShown) {
+            badConnectionSandbar.dismiss()
+        }
         binding?.mediaListRecyclerView?.removeOnScrollListener(onScrollListener)
         binding = null
     }
@@ -80,6 +86,8 @@ class ListFragment : Fragment() {
         return state
     }
 
+    private lateinit var badConnectionSandbar: Snackbar
+
     private fun setupRecyclerView() {
         binding?.mediaListRecyclerView?.apply {
             layoutManager = LinearLayoutManager(activity)
@@ -91,16 +99,31 @@ class ListFragment : Fragment() {
         val medias = viewModel.observeList(tabType!!)
         medias.onEach {
             listAdapter.submitList(it)
-        }.launchIn(lifecycleScope)
+        }.launchIn(MainScope())
 
         val status = viewModel.observeListStatus(tabType!!)
+
+        badConnectionSandbar = Snackbar.make(binding?.swipeRefreshLayout!!,
+            "Bad Internet Connection",
+            Snackbar.LENGTH_INDEFINITE)
+            .setAnchorView((activity as MainActivity).findViewById(R.id.nav_view))
+            .setBackgroundTint(resources.getColor(R.color.bad_connection_snackar_background))
+            .setTextColor(resources.getColor(R.color.bad_connection_snackar_text))
+
         status.onEach {
             if (it) {
-                Log.d("INFO","${this.javaClass}: setupRecyclerView() LOADING")
+                Log.d("INFO", "${this.javaClass}: setupRecyclerView() LOADING")
+                MainScope().launch {
+                    delay(TIME_TO_BAD_CONNECTION_NOTIFICATION)
+                    if (status.value) {
+                        badConnectionSandbar.show()
+                    }
+                }
             } else {
                 listAdapter.notifyDataSetChanged()
+                badConnectionSandbar.dismiss()
             }
-        }.launchIn(lifecycleScope)
+        }.launchIn(MainScope())
     }
 
     inner class OnScrollListener : RecyclerView.OnScrollListener() {
@@ -143,6 +166,7 @@ class ListFragment : Fragment() {
 
     companion object {
         const val TAB_TYPE_TAG = "TAB_TYPE"
+        const val TIME_TO_BAD_CONNECTION_NOTIFICATION = 4000L
 
         fun newInstance(type: MediaType): ListFragment {
             val listFragment = ListFragment()
