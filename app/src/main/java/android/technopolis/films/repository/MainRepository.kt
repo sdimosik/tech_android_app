@@ -275,7 +275,7 @@ class MainRepository : Repository {
     override fun getUserSettings() {
         MainScope().launch(Dispatchers.IO) {
             _userSettingsLoading.value = true
-            _userSettings.value = client.getUserSettings()
+            _userSettings.postValue(client.getUserSettings())
             _userSettingsLoading.value = false
         }
     }

@@ -11,6 +11,20 @@ class ProfileViewModel(
     private val mainRepository: MainRepository
 ) : ViewModel() {
 
+    private var positionViewPager: Int? = 0
+
+    private var isLoadProfile = false
+
+    fun isLoadProfile() = isLoadProfile
+
+    fun saveStateViewPager(savedState: Int?) {
+        positionViewPager = savedState
+    }
+
+    fun getStateViewPager(): Int? {
+        return positionViewPager
+    }
+
     private val _text = MutableStateFlow("This is profile Fragment")
     val text: StateFlow<String> = _text.asStateFlow()
 
@@ -40,4 +54,11 @@ class ProfileViewModel(
     fun observeFavoriteList(): StateFlow<List<FavoriteInProfileItemModel>> {
         return tempList
     }
+
+    fun updateUserSetting() {
+        mainRepository.getUserSettings()
+        isLoadProfile = true
+    }
+
+    fun getUserSetting() = mainRepository.userSettings
 }

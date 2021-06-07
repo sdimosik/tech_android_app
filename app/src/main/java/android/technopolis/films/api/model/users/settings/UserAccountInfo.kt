@@ -5,11 +5,13 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class UserAccountInfo(
-    val timezone: String,
+    @SerialName("timezone")
+    val timezone: String?,
     @SerialName("date_format")
-    val dateFormat: String,
+    val dateFormat: String?,
     @SerialName("time_24hr")
-    val time24hr: String,
+    val time24hr: Boolean?,
     @SerialName("cover_image")
-    val coverImage: String,
+    val coverImage: String?,
+    val token: String?,
 )
