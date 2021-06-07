@@ -5,9 +5,9 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class UserSettings(
-    val user: UserInfo,
-    val account: UserAccountInfo,
-    val connections: UserConnections,
+    val user: UserInfo?,
+    val account: UserAccountInfo?,
+    val connections: UserConnections?,
     @SerialName("sharing_text")
-    val sharingText: UserSharingText,
+    val sharingText: UserSharingText?,
 )
