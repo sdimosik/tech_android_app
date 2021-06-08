@@ -10,6 +10,7 @@ import android.technopolis.films.utils.Utils.isOnline
 import android.technopolis.films.databinding.FragmentFeedShowBinding
 import android.technopolis.films.ui.feed.FeedAdapter
 import android.technopolis.films.ui.feed.FeedViewModel
+import android.view.Gravity
 import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.recyclerview.widget.DividerItemDecoration
@@ -39,6 +40,7 @@ class FeedShowFragment(viewModel: FeedViewModel) : Fragment(),
         )
         noConnectionToast =
             Toast.makeText(activity, getString(R.string.no_connection), Toast.LENGTH_SHORT)
+        noConnectionToast.setGravity(Gravity.CENTER, 0, 0)
         swipeLayout = binding?.swipeContainer!!
         swipeLayout.setOnRefreshListener(this)
         swipeLayout.setColorSchemeColors(resources.getColor(R.color.purple_500))

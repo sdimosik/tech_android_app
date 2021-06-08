@@ -6,6 +6,7 @@ import android.technopolis.films.R
 import android.technopolis.films.api.trakt.model.users.settings.UserSettings
 import android.technopolis.films.utils.Utils.isOnline
 import android.technopolis.films.databinding.FragmentProfileBinding
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -38,6 +39,10 @@ class ProfileFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         swipeLayout.setOnRefreshListener(this)
         swipeLayout.setColorSchemeColors(Color.BLUE)
 
+        noConnectionToast =
+            Toast.makeText(activity, getString(R.string.no_connection), Toast.LENGTH_SHORT)
+        noConnectionToast.setGravity(Gravity.CENTER, 0, 0)
+
         swipeLayout.post {
             if (!profileViewModel.isLoadProfile()) {
                 if (isOnline(requireContext())) {
@@ -61,9 +66,6 @@ class ProfileFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        noConnectionToast =
-            Toast.makeText(activity, getString(R.string.no_connection), Toast.LENGTH_SHORT)
         subscribeDataCallBack()
     }
 
