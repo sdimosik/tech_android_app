@@ -55,12 +55,6 @@ class ProfileFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
             }
         }
 
-        profileViewModel.observeSettings().onEach {
-            if(isOnline(requireContext())) {
-                loadPicture(binding!!.imageProfile, it.user?.images?.avatar?.full!!)
-            }
-        }.launchIn(lifecycleScope)
-
         return binding!!.root
     }
 
@@ -70,20 +64,30 @@ class ProfileFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     }
 
     private fun subscribeDataCallBack() {
-        profileViewModel.getUserSetting().onEach {
-            binding?.nameProfile?.text = it.user?.username
-            binding?.fullName?.text = it.user?.name
-            binding?.location?.text = it.user?.location
+        profileViewModel.getUserSetting().onEach { list ->
+            if (list.isNotEmpty()) {
+                val it = list[0].userSettings
 
-            binding?.facebook?.setTextColor(if (it.connections?.facebook!!) Color.GREEN else Color.RED)
-            binding?.twitter?.setTextColor(if (it.connections?.twitter!!) Color.GREEN else Color.RED)
-            binding?.google?.setTextColor(if (it.connections?.google!!) Color.GREEN else Color.RED)
-            binding?.tumblr?.setTextColor(if (it.connections?.tumblr!!) Color.GREEN else Color.RED)
-            binding?.medium?.setTextColor(if (it.connections?.medium!!) Color.GREEN else Color.RED)
-            binding?.slack?.setTextColor(if (it.connections?.slack!!) Color.GREEN else Color.RED)
-            binding?.apple?.setTextColor(if (it.connections?.apple!!) Color.GREEN else Color.RED)
+                binding?.nameProfile?.text = it.user?.username
+                binding?.fullName?.text = it.user?.name
+                binding?.location?.text = it.user?.location
 
-            swipeLayout.isRefreshing = false
+                binding?.facebook?.setTextColor(if (it.connections?.facebook!!) Color.GREEN else Color.RED)
+                binding?.twitter?.setTextColor(if (it.connections?.twitter!!) Color.GREEN else Color.RED)
+                binding?.google?.setTextColor(if (it.connections?.google!!) Color.GREEN else Color.RED)
+                binding?.tumblr?.setTextColor(if (it.connections?.tumblr!!) Color.GREEN else Color.RED)
+                binding?.medium?.setTextColor(if (it.connections?.medium!!) Color.GREEN else Color.RED)
+                binding?.slack?.setTextColor(if (it.connections?.slack!!) Color.GREEN else Color.RED)
+                binding?.apple?.setTextColor(if (it.connections?.apple!!) Color.GREEN else Color.RED)
+
+                swipeLayout.isRefreshing = false
+            }
+        }.launchIn(lifecycleScope)
+
+        profileViewModel.observeSettings().onEach {
+            if (isOnline(requireContext())) {
+                loadPicture(binding!!.imageProfile, it.user?.images?.avatar?.full!!)
+            }
         }.launchIn(lifecycleScope)
     }
 

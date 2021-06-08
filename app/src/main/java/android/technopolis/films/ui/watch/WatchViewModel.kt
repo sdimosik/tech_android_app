@@ -12,14 +12,12 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
-class WatchViewModel : ViewModel() {
+class WatchViewModel(private val repository: MainRepository) : ViewModel() {
     private var _tabArgs = Bundle()
     val tabArgs get() = _tabArgs
 
     private var _networkState: MutableStateFlow<Boolean> = MutableStateFlow(false)
     var networkState = _networkState.asStateFlow()
-
-    private val repository: Repository = MainRepository()
 
     fun getMoreData(type: MediaType) {
         if(networkState.value) {

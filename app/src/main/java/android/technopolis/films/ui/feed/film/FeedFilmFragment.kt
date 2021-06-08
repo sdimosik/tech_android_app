@@ -86,7 +86,9 @@ class FeedFilmFragment(viewModel: FeedViewModel) : Fragment(),
     private fun subscribeDataCallBack() {
         feedViewModel.moviesRecommendations().onEach {
             feedAdapter.differ.submitList(it)
-            swipeLayout.isRefreshing = false
+            if (it.isNotEmpty()) {
+                swipeLayout.isRefreshing = false
+            }
         }.launchIn(MainScope())
     }
 
