@@ -9,6 +9,7 @@ import android.technopolis.films.databinding.FragmentListBinding
 import android.technopolis.films.ui.base.MainActivity
 import android.technopolis.films.ui.watch.WatchViewModel
 import android.technopolis.films.ui.watch.rvMediaHolder.MediaAdapter
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -63,7 +64,7 @@ class ListFragment : Fragment() {
         setUpSnackBars(navView)
 
         networkState = viewModel.networkState
-        observeNetworkStatus()
+//        observeNetworkStatus()
 
         val medias = viewModel.observeList(tabType!!)
         observeMediaList(medias)
@@ -133,18 +134,17 @@ class ListFragment : Fragment() {
 
         noConnectionToast =
             Toast.makeText(activity, getString(R.string.no_connection), Toast.LENGTH_SHORT)
-//        noConnectionToast.setGravity(R.id.navigation_feed, 0, 0)
     }
 
     private fun observeNetworkStatus() {
         if (!networkState.value) {
             noConnectionToast.show()
-//            noConnectionSandbar.show()
+            noConnectionSandbar.show()
         }
         networkState.onEach {
             if (!it) {
                 noConnectionToast.show()
-//                noConnectionSandbar.show()
+                noConnectionSandbar.show()
             } else if (noConnectionSandbar.isShown) {
                 noConnectionToast.cancel()
                 noConnectionSandbar.dismiss()
@@ -211,12 +211,18 @@ class ListFragment : Fragment() {
     private fun getMoreData() {
         if (networkState.value) {
             viewModel.getMoreData(tabType!!)
+        } else {
+            noConnectionToast.show()
+            viewModel.setNetworkState(false)
         }
     }
 
     private fun updateData() {
         if (networkState.value) {
             viewModel.updateList(tabType!!)
+        } else {
+            noConnectionToast.show()
+            viewModel.setNetworkState(false)
         }
     }
 
