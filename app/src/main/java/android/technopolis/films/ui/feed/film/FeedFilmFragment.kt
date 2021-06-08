@@ -10,10 +10,10 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
@@ -72,7 +72,7 @@ class FeedFilmFragment(viewModel: FeedViewModel) : Fragment(),
         feedViewModel.moviesRecommendations().onEach {
             feedAdapter.differ.submitList(it)
             swipeLayout.isRefreshing = false
-        }.launchIn(lifecycleScope)
+        }.launchIn(MainScope())
     }
 
     override fun onDestroyView() {

@@ -9,6 +9,8 @@ import android.technopolis.films.api.trakt.model.media.WatchListItem
 import android.technopolis.films.api.trakt.model.users.settings.UserSettings
 import android.technopolis.films.api.trakt.model.users.stats.UserStats
 import kotlinx.coroutines.flow.MutableStateFlow
+import retrofit2.Response
+import java.lang.Exception
 
 class Trakt(
     traktClient: MutableStateFlow<TraktClient?>,

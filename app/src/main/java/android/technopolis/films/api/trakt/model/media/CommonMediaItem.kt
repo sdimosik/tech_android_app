@@ -17,7 +17,7 @@ data class CommonMediaItem(
     suspend fun getUrl(type: MediaType): String? {
         /* todo CAUTION govnocode*/
         val id: Int = ids.tmdb!!
-        mediaUrl = TmdbClientGenerator.getClient().getImageUrl(type, id.toString(), "")
+//        mediaUrl = TmdbClientGenerator.getClient().getImageUrl(type, id.toString(), "")
         return mediaUrl
     }
 }

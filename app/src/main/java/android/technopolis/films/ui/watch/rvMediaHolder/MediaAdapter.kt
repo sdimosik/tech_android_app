@@ -3,7 +3,6 @@ package android.technopolis.films.ui.watch.rvMediaHolder
 import android.technopolis.films.api.trakt.model.media.Media
 import android.technopolis.films.api.trakt.model.media.MediaTypeResponse
 import android.technopolis.films.databinding.MediaHolderBinding
-import android.technopolis.films.repository.TmdbRepository
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.appcompat.widget.AppCompatImageView
@@ -32,8 +31,6 @@ class MediaViewHolder(
     private val ivImage: AppCompatImageView = binding.mediaHolderMediaImage
     private val tvName: AppCompatTextView = binding.mediaHolderMediaName
     private val tvDescription: AppCompatTextView = binding.mediaHolderMediaDescription
-
-    private val url = MutableLiveData<String>()
 
     fun bind(media: Media) {
         when (media.type) {

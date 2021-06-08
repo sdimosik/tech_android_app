@@ -15,7 +15,7 @@ import androidx.fragment.app.FragmentPagerAdapter
 import androidx.fragment.app.activityViewModels
 import androidx.viewpager.widget.ViewPager
 
-class FeedFragment : Fragment(R.layout.fragment_feed) {
+class FeedFragment : Fragment() {
 
     private var binding: FragmentFeedBinding? = null
     private val feedViewModel: FeedViewModel by activityViewModels()
