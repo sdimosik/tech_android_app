@@ -39,7 +39,7 @@ class WatchFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         registerConnectivityCallback()
-        val adapter = WatchTabLayoutAdapter(childFragmentManager, 0)
+        val adapter = WatchTabLayoutAdapter(childFragmentManager, 0, requireContext())
 
         val viewPager = binding?.fragmentWatchViewPager!!
 

@@ -1,5 +1,6 @@
 package android.technopolis.films.ui.watch.tabs
 
+import android.content.Context
 import android.technopolis.films.api.trakt.model.media.MediaType
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
@@ -8,6 +9,7 @@ import androidx.fragment.app.FragmentPagerAdapter
 class WatchTabLayoutAdapter(
     fm: FragmentManager,
     behavior: Int,
+    private val context: Context,
 ) : FragmentPagerAdapter(fm, behavior) {
 
     private val names = MediaType.values()
@@ -20,10 +22,10 @@ class WatchTabLayoutAdapter(
     }
 
     override fun getCount(): Int {
-        return names.size
+        return ListFragment.TITLES.size
     }
 
     override fun getPageTitle(position: Int): CharSequence {
-        return names[position].toString()
+        return context.resources.getString(ListFragment.TITLES[position])
     }
 }

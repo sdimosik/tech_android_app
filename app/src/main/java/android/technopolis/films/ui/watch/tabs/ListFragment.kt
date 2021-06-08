@@ -245,5 +245,10 @@ class ListFragment : Fragment() {
             listFragment.arguments = state
             return listFragment
         }
+
+        val TITLES = arrayOf(
+            R.string.watch__tab_layout__film_tab_name,
+            R.string.watch__tab_layout__show_tab_name
+        )
     }
 }

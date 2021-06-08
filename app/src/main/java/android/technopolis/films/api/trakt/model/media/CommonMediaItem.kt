@@ -14,12 +14,10 @@ data class CommonMediaItem(
 
     var mediaUrl: String? = null,
 ) {
-    fun getUrl(type: MediaType): String? {
+    suspend fun getUrl(type: MediaType): String? {
         /* todo CAUTION govnocode*/
         val id: Int = ids.tmdb!!
-        MainScope().launch(Dispatchers.IO) {
-            mediaUrl = TmdbClientGenerator.getClient().getImageUrl(type, id.toString(), "")
-        }
+        mediaUrl = TmdbClientGenerator.getClient().getImageUrl(type, id.toString(), "")
         return mediaUrl
     }
 }
