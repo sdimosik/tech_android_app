@@ -6,6 +6,7 @@ import android.technopolis.films.utils.Utils.isOnline
 import android.technopolis.films.databinding.FragmentFeedFilmBinding
 import android.technopolis.films.ui.feed.FeedAdapter
 import android.technopolis.films.ui.feed.FeedViewModel
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -46,6 +47,8 @@ class FeedFilmFragment(viewModel: FeedViewModel) : Fragment(),
 
         noConnectionToast =
             Toast.makeText(activity, getString(R.string.no_connection), Toast.LENGTH_SHORT)
+        noConnectionToast.setGravity(Gravity.CENTER, 0, 0)
+
 
         swipeLayout.post {
             if (!feedViewModel.isLoadMovie()) {
