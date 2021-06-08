@@ -2,6 +2,7 @@ package android.technopolis.films.ui.feed.film
 
 import android.os.Bundle
 import android.technopolis.films.R
+import android.technopolis.films.utils.Utils.isOnline
 import android.technopolis.films.databinding.FragmentFeedFilmBinding
 import android.technopolis.films.ui.feed.FeedAdapter
 import android.technopolis.films.ui.feed.FeedViewModel
@@ -9,6 +10,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DividerItemDecoration
@@ -43,7 +45,12 @@ class FeedFilmFragment(viewModel: FeedViewModel) : Fragment(),
         swipeLayout.post {
             if (!feedViewModel.isLoadMovie()) {
                 swipeLayout.isRefreshing = true
-                feedViewModel.updateRecommendationsMovies()
+                if (isOnline(requireContext())) {
+                    feedViewModel.updateRecommendationsMovies()
+                } else {
+                    Toast.makeText(activity, "No internet connection", Toast.LENGTH_SHORT).show()
+                    swipeLayout.isRefreshing = false
+                }
             }
         }
 
@@ -81,6 +88,11 @@ class FeedFilmFragment(viewModel: FeedViewModel) : Fragment(),
     }
 
     override fun onRefresh() {
+        if (!isOnline(requireContext())) {
+            swipeLayout.isRefreshing = false
+            Toast.makeText(activity, "No internet connection", Toast.LENGTH_SHORT).show()
+            return
+        }
         swipeLayout.isRefreshing = true
         feedViewModel.updateRecommendationsMovies()
     }
@@ -95,5 +107,4 @@ class FeedFilmFragment(viewModel: FeedViewModel) : Fragment(),
         recyclerViewLayoutManager.onRestoreInstanceState(feedViewModel.getStateMovie())
         super.onResume()
     }
-
 }
