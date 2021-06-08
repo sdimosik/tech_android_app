@@ -46,9 +46,8 @@ class ProfileFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
             }
         }
 
-        viewModel.settings.onEach {
-            settings = it
-            loadPicture(binding!!.imageProfile, settings.user?.images?.avatar?.full!!)
+        viewModel.observeSettings().onEach {
+            loadPicture(binding!!.imageProfile, it.user?.images?.avatar?.full!!)
         }.launchIn(MainScope())
 
         return binding!!.root

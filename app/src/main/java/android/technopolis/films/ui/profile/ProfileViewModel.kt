@@ -9,9 +9,6 @@ import kotlinx.coroutines.flow.Flow
 class ProfileViewModel : ViewModel() {
     private val repository = MainRepository()
 
-    val stats: Flow<UserStats?> = repository.stats
-    val settings: Flow<UserSettings> = repository.userSettings
-
     private var positionViewPager: Int? = 0
 
     private var isLoadProfile = false
@@ -32,4 +29,11 @@ class ProfileViewModel : ViewModel() {
     }
 
     fun getUserSetting() = repository.userSettings
+
+    fun observeStats(): Flow<UserStats?> {
+        return repository.stats
+    }
+    fun observeSettings(): Flow<UserSettings> {
+        return repository.userSettings
+    }
 }
