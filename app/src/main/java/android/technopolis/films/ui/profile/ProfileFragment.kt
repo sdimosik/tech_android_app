@@ -4,10 +4,12 @@ import android.annotation.SuppressLint
 import android.graphics.Color
 import android.os.Bundle
 import android.technopolis.films.R
+import android.technopolis.films.Utils.isOnline
 import android.technopolis.films.databinding.FragmentProfileBinding
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
@@ -35,8 +37,13 @@ class ProfileFragment : Fragment(R.layout.fragment_profile),
 
         swipeLayout.post {
             if (!profileViewModel.isLoadProfile()) {
-                swipeLayout.isRefreshing = true
-                profileViewModel.updateUserSetting()
+                if (isOnline(requireContext())) {
+                    swipeLayout.isRefreshing = true
+                    profileViewModel.updateUserSetting()
+                } else {
+                    Toast.makeText(activity, "No internet connection", Toast.LENGTH_SHORT).show()
+                    swipeLayout.isRefreshing = false
+                }
             }
         }
 
@@ -49,7 +56,6 @@ class ProfileFragment : Fragment(R.layout.fragment_profile),
         subscribeDataCallBack()
     }
 
-    @SuppressLint("SetTextI18n")
     private fun subscribeDataCallBack() {
         profileViewModel.getUserSetting().onEach {
             binding?.nameProfile?.text = it.user?.username
@@ -74,6 +80,11 @@ class ProfileFragment : Fragment(R.layout.fragment_profile),
     }
 
     override fun onRefresh() {
+        if (!isOnline(requireContext())) {
+            swipeLayout.isRefreshing = false
+            Toast.makeText(activity, "No internet connection", Toast.LENGTH_SHORT).show()
+            return
+        }
         swipeLayout.isRefreshing = true
         profileViewModel.updateUserSetting()
     }
