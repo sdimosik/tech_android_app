@@ -1,6 +1,5 @@
 package android.technopolis.films.ui.feed.show
 
-import android.graphics.Color
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -18,7 +17,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
-class FeedShowFragment(viewModel: FeedViewModel) : Fragment(R.layout.fragment_feed_show),
+class FeedShowFragment(viewModel: FeedViewModel) : Fragment(),
     SwipeRefreshLayout.OnRefreshListener {
 
     private var binding: FragmentFeedShowBinding? = null
@@ -30,7 +29,7 @@ class FeedShowFragment(viewModel: FeedViewModel) : Fragment(R.layout.fragment_fe
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         binding = FragmentFeedShowBinding.inflate(
             inflater, container, false
@@ -38,7 +37,7 @@ class FeedShowFragment(viewModel: FeedViewModel) : Fragment(R.layout.fragment_fe
 
         swipeLayout = binding?.swipeContainer!!
         swipeLayout.setOnRefreshListener(this)
-        swipeLayout.setColorSchemeColors(Color.BLUE)
+        swipeLayout.setColorSchemeColors(resources.getColor(R.color.purple_500))
 
         swipeLayout.post {
             if (!feedViewModel.isLoadShow()) {

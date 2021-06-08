@@ -6,9 +6,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
-class HistoryViewModel(
-    private val mainRepository: MainRepository
-) : ViewModel() {
+class HistoryViewModel : ViewModel() {
+    private val mainRepository = MainRepository()
 
     private val _text = MutableStateFlow("This is history Fragment")
     val text: StateFlow<String> = _text.asStateFlow()

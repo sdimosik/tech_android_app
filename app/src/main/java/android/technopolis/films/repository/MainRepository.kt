@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -66,25 +67,24 @@ class MainRepository : Repository {
 
     /*============================================================================================*/
 
-    override val moviesWatchListLoading: StateFlow<Boolean> =
-        config.getConfig(MediaType.movies).watchListLoading.asStateFlow()
-    override val moviesWatchList: Flow<MutableList<Media>> =
-        config.getConfig(MediaType.movies).watchList.asFlow()
+    override val moviesWatchListLoading: MutableStateFlow<Boolean> =
+        config.getConfig(MediaType.movies).watchListLoading
+    override val moviesWatchList: MutableLiveData<MutableList<Media>> =
+        config.getConfig(MediaType.movies).watchList
 
     /*____________________________________________________________________________________________*/
 
-    override val showsWatchListLoading: StateFlow<Boolean> =
-        config.getConfig(MediaType.shows).watchListLoading.asStateFlow()
-    override val showsWatchList: Flow<MutableList<Media>> =
-        config.getConfig(MediaType.shows).watchList.asFlow()
+    override val showsWatchListLoading: MutableStateFlow<Boolean> =
+        config.getConfig(MediaType.shows).watchListLoading
+    override val showsWatchList: MutableLiveData<MutableList<Media>> =
+        config.getConfig(MediaType.shows).watchList
 
     /*____________________________________________________________________________________________*/
 
     override fun getWatchList(type: MediaType) {
         MainScope().launch(Dispatchers.IO) {
             val c = config.getConfig(type)
-            if (c.watchListLoadingMutex.isLocked) {
-                println("getWatchList(): lock is busy. cant getWatchList")
+            if (c.watchListLoadingMutex.isLocked || c.watchListLoading.value) {
                 cancel()
             }
 
@@ -96,16 +96,14 @@ class MainRepository : Repository {
     }
 
     override fun updateWatchList(type: MediaType) {
-        println("updateWatchList(): update")
         MainScope().launch {
             val c = config.getConfig(type)
             if (c.watchListLoadingMutex.isLocked) {
                 c.watchListCancel.value = true
-                println("updateWatchList(): mutex is locked. try to unlock")
+                cancel()
             }
 
             c.watchListLoadingMutex.withLock {
-                println("updateWatchList(): inside mutex")
                 c.isWatchListEnded.value = false
                 c.currentWatchListPage.value = 0
                 c.watchList.value = mutableListOf()
@@ -150,11 +148,9 @@ class MainRepository : Repository {
     }
 
     private fun setUpCancellation(config: ConfigImpl, coroutineScope: CoroutineScope) {
-        println("setUpCancellation() ${config.watchListCancel.value}")
+        //todo повесить на этот метод отмену загрузки по истечению задержки
         config.watchListCancel.asStateFlow().onEach {
-            println("setUpCancellation() -> onEach")
             if (it) {
-                println("cancel job")
                 coroutineScope.cancel()
             }
         }.launchIn(coroutineScope)

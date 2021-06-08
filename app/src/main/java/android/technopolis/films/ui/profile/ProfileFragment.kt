@@ -19,7 +19,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
-class ProfileFragment : Fragment(R.layout.fragment_profile),
+class ProfileFragment : Fragment(),
     SwipeRefreshLayout.OnRefreshListener {
 
     private var binding: FragmentProfileBinding? = null
@@ -29,13 +29,13 @@ class ProfileFragment : Fragment(R.layout.fragment_profile),
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         binding = FragmentProfileBinding.inflate(inflater, container, false)
 
         swipeLayout = binding?.swipeContainer!!
         swipeLayout.setOnRefreshListener(this)
-        swipeLayout.setColorSchemeColors(Color.BLUE)
+        swipeLayout.setColorSchemeColors(resources.getColor(R.color.purple_500))
 
         swipeLayout.post {
             if (!profileViewModel.isLoadProfile()) {
@@ -105,7 +105,7 @@ class ProfileFragment : Fragment(R.layout.fragment_profile),
 
     class ViewPagerAdapter(
         fm: FragmentManager,
-        behavior: Int
+        behavior: Int,
     ) : FragmentPagerAdapter(fm, behavior) {
 
         override fun getItem(position: Int): Fragment {

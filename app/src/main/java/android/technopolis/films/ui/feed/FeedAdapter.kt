@@ -10,7 +10,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 
 class FeedAdapterHolder(
-    private val itemBinding: FeedSubAdapterItemBinding
+    private val itemBinding: FeedSubAdapterItemBinding,
 ) : RecyclerView.ViewHolder(itemBinding.root) {
 
     fun bindTo(item: CommonMediaItem) {
@@ -30,14 +30,14 @@ private val differCallback = object :
     DiffUtil.ItemCallback<CommonMediaItem>() {
     override fun areItemsTheSame(
         oldItem: CommonMediaItem,
-        newItem: CommonMediaItem
+        newItem: CommonMediaItem,
     ): Boolean {
         return oldItem.ids.trakt == newItem.ids.trakt
     }
 
     override fun areContentsTheSame(
         oldItem: CommonMediaItem,
-        newItem: CommonMediaItem
+        newItem: CommonMediaItem,
     ): Boolean {
         return oldItem == newItem
     }

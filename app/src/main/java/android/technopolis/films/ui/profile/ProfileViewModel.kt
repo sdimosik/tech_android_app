@@ -7,9 +7,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
-class ProfileViewModel(
-    private val mainRepository: MainRepository
-) : ViewModel() {
+class ProfileViewModel : ViewModel() {
+    private val mainRepository = MainRepository()
 
     private var positionViewPager: Int? = 0
 

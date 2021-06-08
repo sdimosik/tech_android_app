@@ -9,13 +9,13 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 
 
-class InfoInProfileFragment : Fragment(R.layout.fragment_info_in_profile) {
+class InfoInProfileFragment : Fragment() {
 
     private var binding: FragmentInfoInProfileBinding? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         binding = FragmentInfoInProfileBinding.inflate(
             inflater, container, false

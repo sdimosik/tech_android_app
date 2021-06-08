@@ -9,21 +9,22 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
-class HistoryFragment : Fragment(R.layout.fragment_history) {
+class HistoryFragment : Fragment() {
 
     private var _binding: FragmentHistoryBinding? = null
     private val binding get() = _binding!!
 
-    private lateinit var historyViewModel: HistoryViewModel
+    private val historyViewModel: HistoryViewModel by activityViewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         _binding = FragmentHistoryBinding.inflate(
             inflater, container, false
@@ -34,8 +35,6 @@ class HistoryFragment : Fragment(R.layout.fragment_history) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        historyViewModel = (activity as MainActivity).historyViewModel
 
         historyViewModel.text
             .onEach { text ->

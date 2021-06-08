@@ -6,6 +6,8 @@ import android.technopolis.films.api.model.media.MediaType
 import android.technopolis.films.repository.MainRepository
 import android.technopolis.films.repository.Repository
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asFlow
+import androidx.lifecycle.asLiveData
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -31,16 +33,16 @@ class WatchViewModel : ViewModel() {
     fun observeListStatus(type: MediaType): StateFlow<Boolean> {
         return when (type) {
             MediaType.movies -> {
-                repository.moviesWatchListLoading
+                repository.moviesWatchListLoading.asStateFlow()
             }
             MediaType.shows -> {
-                repository.showsWatchListLoading
+                repository.showsWatchListLoading.asStateFlow()
             }
         }
     }
 
     fun observeList(type: MediaType): Flow<MutableList<Media>> {
-        return when (type) {
+        val list = when (type) {
             MediaType.movies -> {
                 repository.moviesWatchList
             }
@@ -48,8 +50,11 @@ class WatchViewModel : ViewModel() {
                 repository.showsWatchList
             }
         }
+        if (list.value!!.isEmpty()) {
+            repository.getWatchList(type)
+        }
+        return list.asFlow()
     }
-
 
     fun onPageChanged(savedState: Bundle) {
         tabArgs.putAll(savedState)

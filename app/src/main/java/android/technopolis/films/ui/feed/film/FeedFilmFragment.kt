@@ -1,6 +1,5 @@
 package android.technopolis.films.ui.feed.film
 
-import android.graphics.Color
 import android.os.Bundle
 import android.technopolis.films.R
 import android.technopolis.films.databinding.FragmentFeedFilmBinding
@@ -19,7 +18,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
 
-class FeedFilmFragment(viewModel: FeedViewModel) : Fragment(R.layout.fragment_feed_film),
+class FeedFilmFragment(viewModel: FeedViewModel) : Fragment(),
     SwipeRefreshLayout.OnRefreshListener {
 
     private var binding: FragmentFeedFilmBinding? = null
@@ -31,7 +30,7 @@ class FeedFilmFragment(viewModel: FeedViewModel) : Fragment(R.layout.fragment_fe
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         binding = FragmentFeedFilmBinding.inflate(
             inflater, container, false
@@ -39,7 +38,7 @@ class FeedFilmFragment(viewModel: FeedViewModel) : Fragment(R.layout.fragment_fe
 
         swipeLayout = binding?.swipeContainer!!
         swipeLayout.setOnRefreshListener(this)
-        swipeLayout.setColorSchemeColors(Color.BLUE)
+        swipeLayout.setColorSchemeColors(resources.getColor(R.color.purple_500))
 
         swipeLayout.post {
             if (!feedViewModel.isLoadMovie()) {

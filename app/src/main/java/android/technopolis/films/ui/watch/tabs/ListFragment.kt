@@ -1,8 +1,10 @@
 package android.technopolis.films.ui.watch.tabs
 
+import android.content.res.Resources
 import android.os.Bundle
 import android.os.Parcelable
 import android.technopolis.films.R
+import android.technopolis.films.api.model.media.Media
 import android.technopolis.films.api.model.media.MediaType
 import android.technopolis.films.databinding.FragmentListBinding
 import android.technopolis.films.ui.base.MainActivity
@@ -22,9 +24,12 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.onEmpty
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 
 class ListFragment : Fragment() {
@@ -56,25 +61,25 @@ class ListFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupRecyclerView()
-        val mediaListRecyclerView = binding?.mediaListRecyclerView
 
-        mediaListRecyclerView?.layoutManager?.onRestoreInstanceState(
-            viewModel.getTabProperty(ARGS_TAG!!) as Parcelable?
-        )
+        val navView = (activity as MainActivity).findViewById<View>(R.id.nav_view)
+        setUpSnackBars(navView)
 
-        mediaListRecyclerView?.addOnScrollListener(onScrollListener)
+        networkState = viewModel.networkState
+        observeNetworkStatus()
 
-        binding?.swipeRefreshLayout?.setOnRefreshListener(OnRefreshListener())
+        val medias = viewModel.observeList(tabType!!)
+        observeMediaList(medias)
+
+        val status = viewModel.observeListStatus(tabType!!)
+        observeDownloadingStatus(status)
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
-        if (badConnectionSandbar.isShown) {
-            badConnectionSandbar.dismiss()
-        }
-        if (noConnectionSandbar.isShown) {
-            noConnectionSandbar.dismiss()
-        }
+        badConnectionSandbar.dismiss()
+        noConnectionSandbar.dismiss()
+
         binding?.mediaListRecyclerView?.removeOnScrollListener(onScrollListener)
         binding = null
     }
@@ -99,7 +104,20 @@ class ListFragment : Fragment() {
             adapter = listAdapter
         }
 
-        val navView = (activity as MainActivity).findViewById<View>(R.id.nav_view)
+        val mediaListRecyclerView = binding?.mediaListRecyclerView
+
+        mediaListRecyclerView?.layoutManager?.onRestoreInstanceState(
+            viewModel.getTabProperty(ARGS_TAG!!) as Parcelable?
+        )
+
+        mediaListRecyclerView?.addOnScrollListener(onScrollListener)
+
+        val swipeRefreshLayout = binding?.swipeRefreshLayout
+        swipeRefreshLayout?.setOnRefreshListener(OnRefreshListener())
+        swipeRefreshLayout?.setColorSchemeColors(resources.getColor(R.color.purple_500))
+    }
+
+    private fun setUpSnackBars(navView: View?) {
         noConnectionSandbar = Snackbar.make(binding?.swipeRefreshLayout!!,
             resources.getString(R.string.no_connection),
             Snackbar.LENGTH_INDEFINITE)
@@ -107,7 +125,15 @@ class ListFragment : Fragment() {
             .setBackgroundTint(resources.getColor(R.color.bad_connection_snackar_background))
             .setTextColor(resources.getColor(R.color.bad_connection_snackar_text))
 
-        networkState = viewModel.networkState
+        badConnectionSandbar = Snackbar.make(binding?.swipeRefreshLayout!!,
+            resources.getString(R.string.bad_connection),
+            Snackbar.LENGTH_INDEFINITE)
+            .setAnchorView(navView)
+            .setBackgroundTint(resources.getColor(R.color.bad_connection_snackar_background))
+            .setTextColor(resources.getColor(R.color.bad_connection_snackar_text))
+    }
+
+    private fun observeNetworkStatus() {
         if (!networkState.value) {
             noConnectionSandbar.show()
         }
@@ -118,36 +144,34 @@ class ListFragment : Fragment() {
                 noConnectionSandbar.dismiss()
             }
         }.launchIn(MainScope())
+    }
 
-        val medias = viewModel.observeList(tabType!!)
-        getMoreData()
+    private fun observeMediaList(medias: Flow<MutableList<Media>>) {
         medias.onEach {
             listAdapter.submitList(it)
         }.launchIn(MainScope())
+    }
 
-        val status = viewModel.observeListStatus(tabType!!)
-
-        badConnectionSandbar = Snackbar.make(binding?.swipeRefreshLayout!!,
-            resources.getString(R.string.bad_connection),
-            Snackbar.LENGTH_INDEFINITE)
-            .setAnchorView(navView)
-            .setBackgroundTint(resources.getColor(R.color.bad_connection_snackar_background))
-            .setTextColor(resources.getColor(R.color.bad_connection_snackar_text))
-
-        status.onEach {
-            if (it) {
-                MainScope().launch {
-                    delay(TIME_TO_BAD_CONNECTION_NOTIFICATION)
-                    if (status.value) {
-                        badConnectionSandbar.show()
-                    }
+    private fun observeDownloadingStatus(status: StateFlow<Boolean>) {
+        MainScope().launch {
+            status.onEach {
+                if (it) {
+//                    launch {
+//                        delay(TIME_TO_BAD_CONNECTION_NOTIFICATION)
+//                        if (status.value) {
+//                            badConnectionSandbar.show()
+//                        } else {
+//                            badConnectionSandbar.dismiss()
+//                            cancel()
+//                        }
+//                    }
+                } else {
+                    listAdapter.notifyDataSetChanged()
+                    showList(listAdapter.currentList.isEmpty())
+//                    badConnectionSandbar.dismiss()
                 }
-            } else {
-                listAdapter.notifyDataSetChanged()
-                showList(listAdapter.currentList.isEmpty())
-                badConnectionSandbar.dismiss()
-            }
-        }.launchIn(MainScope())
+            }.launchIn(this)
+        }
     }
 
     private fun showList(isEmpty: Boolean) {

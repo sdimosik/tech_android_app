@@ -6,20 +6,20 @@
         android:icon="@drawable/ic_watch_black_24dp"
         android:title="@string/title_watch" />
 
-    <item
-        android:id="@id/navigation_calendar"
-        android:icon="@drawable/ic_calendar_black_24dp"
-        android:title="@string/title_calendar" />
+<!--    <item-->
+<!--        android:id="@id/navigation_calendar"-->
+<!--        android:icon="@drawable/ic_calendar_black_24dp"-->
+<!--        android:title="@string/title_calendar" />-->
 
     <item
         android:id="@id/navigation_feed"
         android:icon="@drawable/ic_feed_black_24dp"
         android:title="@string/title_feed" />
 
-    <item
-        android:id="@id/navigation_history"
-        android:icon="@drawable/ic_history_black_24dp"
-        android:title="@string/title_history" />
+<!--    <item-->
+<!--        android:id="@id/navigation_history"-->
+<!--        android:icon="@drawable/ic_history_black_24dp"-->
+<!--        android:title="@string/title_history" />-->
 
     <item
         android:id="@id/navigation_profile"
