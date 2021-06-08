@@ -1,13 +1,12 @@
 package android.technopolis.films.ui.watch
 
 import android.os.Bundle
-import android.technopolis.films.api.model.media.Media
-import android.technopolis.films.api.model.media.MediaType
+import android.technopolis.films.api.trakt.model.media.Media
+import android.technopolis.films.api.trakt.model.media.MediaType
 import android.technopolis.films.repository.MainRepository
 import android.technopolis.films.repository.Repository
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asFlow
-import androidx.lifecycle.asLiveData
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

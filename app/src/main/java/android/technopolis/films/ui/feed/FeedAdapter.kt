@@ -1,6 +1,6 @@
 package android.technopolis.films.ui.feed
 
-import android.technopolis.films.api.model.media.CommonMediaItem
+import android.technopolis.films.api.trakt.model.media.CommonMediaItem
 import android.technopolis.films.databinding.FeedSubAdapterItemBinding
 import android.view.LayoutInflater
 import android.view.ViewGroup

@@ -8,6 +8,7 @@ Properties properties = new Properties()
 properties.load(project.rootProject.file('keys.properties').newDataInputStream())
 def traktClientId = properties.getProperty('trakt.clientId')
 def traktClientSecret = properties.getProperty('trakt.clientSecret')
+def accessToken = properties.getProperty('tmdb.accessToken')
 
 android {
     compileSdkVersion 30
@@ -27,6 +28,11 @@ android {
         buildConfigField "String", "TRAKT_BASE_API_URL", '"https://api.trakt.tv"'
         buildConfigField "String", "TRAKT_REDIRECT_URL", '"trakt://"'
         buildConfigField "String", "TRAKT_LOGIN_URL", '"https://trakt.tv/oauth/authorize?response_type=code&client_id=%s&redirect_uri=%s"'
+
+        buildConfigField "String", "TMDB_ACCESS_TOKEN", "\"${accessToken}\""
+        buildConfigField "String", "TMDB_BASE_API_URL", '"https://api.themoviedb.org/3/"'
+        buildConfigField "String", "TMDB_IMAGE_API_URL", '"https://image.tmdb.org/t/p/"'
+
     }
 
     buildFeatures {
@@ -65,10 +71,11 @@ dependencies {
     implementation 'org.jetbrains.kotlinx:kotlinx-serialization-json:1.2.1'
     implementation "com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:0.8.0"
 
+    //work with api
     implementation 'com.squareup.retrofit2:retrofit:2.6.4'
     implementation 'com.squareup.okhttp3:okhttp:4.7.2'
     implementation 'com.squareup.okhttp3:logging-interceptor:4.7.2'
-    implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.0.0'
+    implementation 'com.squareup.picasso:picasso:2.71828'
 
     testImplementation 'junit:junit:4.+'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'

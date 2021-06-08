@@ -1,8 +1,12 @@
 package android.technopolis.films.ui.watch.rvMediaHolder
 
-import android.technopolis.films.api.model.media.MediaTypeResponse
-import android.technopolis.films.api.model.media.Media
+import android.technopolis.films.api.tmdb.TmdbClientGenerator
+import android.technopolis.films.api.trakt.model.media.MediaTypeResponse
+import android.technopolis.films.api.trakt.model.media.Media
+import android.technopolis.films.api.trakt.model.media.MediaType
 import android.technopolis.films.databinding.MediaHolderBinding
+import android.technopolis.films.repository.TmdbRepository
+import android.technopolis.films.ui.watch.WatchViewModel
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.appcompat.widget.AppCompatImageView
@@ -12,6 +16,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 
 class MediaAdapter : ListAdapter<Media, MediaViewHolder>(MediaDiff) {
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MediaViewHolder {
         val binding = MediaHolderBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return MediaViewHolder(binding)
@@ -30,14 +35,19 @@ class MediaViewHolder(
     private val tvDescription: AppCompatTextView = binding.mediaHolderMediaDescription
 
     fun bind(media: Media) {
+        val tmdbRepository = TmdbRepository()
         when (media.type) {
             MediaTypeResponse.movie -> {
-                tvName.text = media.movie?.title
-                tvDescription.text = media.movie?.year.toString()
+                val movie = media.movie
+                tvName.text = movie?.title
+                tvDescription.text = movie?.year.toString()
+                tmdbRepository.bindImage(ivImage, MediaType.movies, movie?.ids?.tmdb!!)
             }
             MediaTypeResponse.show -> {
-                tvName.text = media.show?.title
-                tvDescription.text = media.show?.year.toString()
+                val show = media.show
+                tvName.text = show?.title
+                tvDescription.text = show?.year.toString()
+                tmdbRepository.bindImage(ivImage, MediaType.shows, show?.ids?.tmdb!!)
             }
         }
 

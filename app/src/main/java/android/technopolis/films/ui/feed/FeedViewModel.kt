@@ -1,7 +1,7 @@
 package android.technopolis.films.ui.feed
 
 import android.os.Parcelable
-import android.technopolis.films.api.model.media.MediaType
+import android.technopolis.films.api.trakt.model.media.MediaType
 import android.technopolis.films.repository.MainRepository
 import androidx.lifecycle.ViewModel
 
