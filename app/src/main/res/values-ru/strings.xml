@@ -15,4 +15,24 @@
     <string name="bad_connection">Плохое интернет-соедниение.</string>
     <string name="no_connection">Нет интернет-соединения.</string>
 
+    <!-- FeedFragment -->
+    <string name="feed__tab_layout__film_tab_name">Фильмы</string>
+    <string name="feed__tab_layout__show_tab_name">Сериалы</string>
+
+    <string name="feed_name_item">Название</string>
+    <string name="feed_year_item">Год</string>
+
+    <!-- ProfileFragment -->
+    <string name="profile_username">Ник</string>
+    <string name="profile_name">Имя</string>
+    <string name="profile_location">Локация</string>
+
+    <string name="profile_facebook">Facebook</string>
+    <string name="profile_twitter">Twitter</string>
+    <string name="profile_google">Google</string>
+    <string name="profile_tumblr">Tumblr</string>
+    <string name="profile_medium">Medium</string>
+    <string name="profile_slack">Slack</string>
+    <string name="profile_apple">Apple</string>
+
 </resources>

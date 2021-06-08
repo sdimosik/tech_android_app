@@ -16,8 +16,22 @@
     <string name="no_connection">No internet connection.</string>
 
     <!-- FeedFragment -->
+    <string name="feed__tab_layout__film_tab_name">Films</string>
+    <string name="feed__tab_layout__show_tab_name">Shows</string>
+
     <string name="feed_name_item">Name</string>
-    <string name="feed_someInfo_item">SomeInfo</string>
-    <string name="feed_type_item">Type</string>
-    <string name="feed_rating_item">Rating</string>
+    <string name="feed_year_item">Year</string>
+
+    <!-- ProfileFragment -->
+    <string name="profile_username">Username</string>
+    <string name="profile_name">Name</string>
+    <string name="profile_location">Location</string>
+
+    <string name="profile_facebook">Facebook</string>
+    <string name="profile_twitter">Twitter</string>
+    <string name="profile_google">Google</string>
+    <string name="profile_tumblr">Tumblr</string>
+    <string name="profile_medium">Medium</string>
+    <string name="profile_slack">Slack</string>
+    <string name="profile_apple">Apple</string>
 </resources>
