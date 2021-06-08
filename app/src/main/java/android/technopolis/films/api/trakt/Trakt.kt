@@ -43,6 +43,10 @@ class Trakt(
             return mutableListOf()
         }
 
+        recommendations.body()?.forEach {
+            it.getUrl(type)
+        }
+
         return recommendations.body()!!
     }
 
@@ -58,7 +62,9 @@ class Trakt(
             println(watchList.errorBody())
             return mutableListOf()
         }
-
+        watchList.body()?.forEach {
+            it.get()?.getUrl(type)
+        }
         return watchList.body()!!
     }
 

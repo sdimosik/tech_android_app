@@ -1,12 +1,9 @@
 package android.technopolis.films.api.trakt.model.media
 
-import android.technopolis.films.api.trakt.model.media.movies.Movie
-import android.technopolis.films.api.trakt.model.media.shows.Show
-
 interface Media {
     val type: MediaTypeResponse
-    val movie: Movie?
-    val show: Show?
+    val movie: CommonMediaItem?
+    val show: CommonMediaItem?
 
     fun equalsTo(other: Media): Boolean {
         if (this.type != other.type) {
@@ -16,6 +13,13 @@ interface Media {
         return when (type) {
             MediaTypeResponse.movie -> this.movie?.ids?.trakt == other.movie?.ids?.trakt
             MediaTypeResponse.show -> this.show?.ids?.trakt == other.show?.ids?.trakt
+        }
+    }
+
+    fun get(): CommonMediaItem? {
+        return when (type) {
+            MediaTypeResponse.movie -> movie
+            MediaTypeResponse.show -> show
         }
     }
 }

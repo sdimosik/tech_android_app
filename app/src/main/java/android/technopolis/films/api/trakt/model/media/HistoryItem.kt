@@ -12,6 +12,6 @@ data class HistoryItem(
     val watchedAt: String, //LocalDateTime
     val action: String,
     override val type: MediaTypeResponse,
-    override val movie: Movie? = null,
-    override val show: Show? = null
+    override val movie: CommonMediaItem? = null,
+    override val show: CommonMediaItem? = null,
 ) : Media
