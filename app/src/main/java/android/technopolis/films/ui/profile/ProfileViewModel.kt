@@ -6,8 +6,7 @@ import android.technopolis.films.repository.MainRepository
 import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.Flow
 
-class ProfileViewModel : ViewModel() {
-    private val repository = MainRepository()
+class ProfileViewModel(private val repository: MainRepository) : ViewModel() {
 
     private var positionViewPager: Int? = 0
 
@@ -28,11 +27,12 @@ class ProfileViewModel : ViewModel() {
         isLoadProfile = true
     }
 
-    fun getUserSetting() = repository.userSettings
+    fun getUserSetting() = repository.getProfileSetting()
 
     fun observeStats(): Flow<UserStats?> {
         return repository.stats
     }
+
     fun observeSettings(): Flow<UserSettings> {
         return repository.userSettings
     }

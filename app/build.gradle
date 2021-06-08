@@ -2,6 +2,7 @@ plugins {
     id 'org.jetbrains.kotlin.plugin.serialization' version '1.5.0'
     id 'com.android.application'
     id 'kotlin-android'
+    id 'kotlin-kapt'
 }
 
 Properties properties = new Properties()
@@ -83,4 +84,11 @@ dependencies {
 
     //swipe to refresh
     implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
+
+    // Room
+    implementation "androidx.room:room-runtime:2.3.0"
+    kapt "androidx.room:room-compiler:2.3.0"
+
+    // Kotlin Extensions and Coroutines support for Room
+    implementation "androidx.room:room-ktx:2.3.0"
 }

@@ -10,22 +10,29 @@ import android.technopolis.films.api.trakt.model.media.HistoryItem
 import android.technopolis.films.api.trakt.model.media.Media
 import android.technopolis.films.api.trakt.model.media.MediaType
 import android.technopolis.films.api.trakt.model.media.SortType
+import android.technopolis.films.db.UserSettingDatabase
+import android.technopolis.films.model.SettingForUser
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.asFlow
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.cancel
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.withLock
+import okhttp3.Dispatcher
 
 
-class MainRepository : Repository {
+class MainRepository(private val db: UserSettingDatabase) : Repository {
+
+    /*____________________________________________________________________________________________*/
+
+    private fun addProfileSetting(settingForUser: SettingForUser) =
+        db.getUserSettingDAO().addUserSetting(settingForUser)
+
+    fun getProfileSetting() = db.getUserSettingDAO().getUserSetting()
 
     private val client: Trakt = TraktClientGenerator.getClient()
     private val config = Config()
@@ -269,9 +276,15 @@ class MainRepository : Repository {
     override val userSettings: Flow<UserSettings> = _userSettings.asFlow()
 
     override fun getUserSettings() {
-        MainScope().launch {
+        GlobalScope.launch(Dispatchers.IO) {
             _userSettingsLoading.value = true
-            _userSettings.postValue(client.getUserSettings())
+            val userSettings = client.getUserSettings()
+            val settingForUser = SettingForUser(
+                0,
+                userSettings
+            )
+            addProfileSetting(settingForUser)
+            _userSettings.postValue(userSettings)
             _userSettingsLoading.value = false
         }
     }

@@ -5,7 +5,16 @@ import android.technopolis.films.R
 import android.technopolis.films.api.trakt.TraktApiConfig
 import android.technopolis.films.api.trakt.TraktClientGenerator
 import android.technopolis.films.databinding.ActivityMainBinding
+import android.technopolis.films.db.UserSettingDatabase
+import android.technopolis.films.repository.MainRepository
+import android.technopolis.films.ui.feed.FeedViewModel
+import android.technopolis.films.ui.feed.FeedViewModelFactory
+import android.technopolis.films.ui.profile.ProfileViewModel
+import android.technopolis.films.ui.profile.ProfileViewModelFactory
+import android.technopolis.films.ui.watch.WatchViewModel
+import android.technopolis.films.ui.watch.WatchViewModelFactory
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
 import androidx.navigation.ui.setupWithNavController
 import androidx.navigation.findNavController
@@ -13,6 +22,9 @@ import androidx.navigation.findNavController
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
+    lateinit var watchViewModel: WatchViewModel
+    lateinit var feedViewModel: FeedViewModel
+    lateinit var profileViewModel: ProfileViewModel
 
     private lateinit var navController: NavController
 
@@ -37,8 +49,60 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
 
         setContentView(binding.root)
+
+        setUpViewModel()
         setUpNavController()
     }
+
+    private fun setUpViewModel() {
+
+        val mainRepository = MainRepository(
+            UserSettingDatabase(this)
+        )
+
+        setUpViewModelFeed(mainRepository)
+        setUpViewModelProfile(mainRepository)
+        setUpViewModelWatch(mainRepository)
+    }
+
+    private fun setUpViewModelWatch(mainRepository: MainRepository) {
+        val watchViewModelProviderFactory =
+            WatchViewModelFactory(
+                mainRepository
+            )
+
+        watchViewModel = ViewModelProvider(
+            this,
+            watchViewModelProviderFactory
+        ).get(WatchViewModel::class.java)
+    }
+
+    private fun setUpViewModelFeed(mainRepository: MainRepository) {
+
+        val feedViewModelProviderFactory =
+            FeedViewModelFactory(
+                mainRepository
+            )
+
+        feedViewModel = ViewModelProvider(
+            this,
+            feedViewModelProviderFactory
+        ).get(FeedViewModel::class.java)
+    }
+
+    private fun setUpViewModelProfile(mainRepository: MainRepository) {
+
+        val profileViewModelProviderFactory =
+            ProfileViewModelFactory(
+                mainRepository
+            )
+
+        profileViewModel = ViewModelProvider(
+            this,
+            profileViewModelProviderFactory
+        ).get(ProfileViewModel::class.java)
+    }
+
 
     private fun setUpNavController() {
         navController = findNavController(R.id.nav_host_fragment)

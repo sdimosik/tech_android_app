@@ -5,8 +5,7 @@ import android.technopolis.films.api.trakt.model.media.MediaType
 import android.technopolis.films.repository.MainRepository
 import androidx.lifecycle.ViewModel
 
-class FeedViewModel : ViewModel() {
-    private val mainRepository = MainRepository()
+class FeedViewModel(private val mainRepository: MainRepository) : ViewModel() {
 
     private var positionMovie: Parcelable? = null
     private var isLoadMovie = false
