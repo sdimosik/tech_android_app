@@ -27,6 +27,7 @@ class FeedShowFragment(viewModel: FeedViewModel) : Fragment(),
     private val feedViewModel = viewModel
     private var recyclerViewLayoutManager = LinearLayoutManager(activity)
     private lateinit var swipeLayout: SwipeRefreshLayout
+    private lateinit var noConnectionToast: Toast
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -36,7 +37,8 @@ class FeedShowFragment(viewModel: FeedViewModel) : Fragment(),
         binding = FragmentFeedShowBinding.inflate(
             inflater, container, false
         )
-
+        noConnectionToast =
+            Toast.makeText(activity, getString(R.string.no_connection), Toast.LENGTH_SHORT)
         swipeLayout = binding?.swipeContainer!!
         swipeLayout.setOnRefreshListener(this)
         swipeLayout.setColorSchemeColors(resources.getColor(R.color.purple_500))
@@ -47,7 +49,7 @@ class FeedShowFragment(viewModel: FeedViewModel) : Fragment(),
                 if (isOnline(requireContext())) {
                     feedViewModel.updateRecommendationsShows()
                 } else {
-                    Toast.makeText(activity, "No internet connection", Toast.LENGTH_SHORT).show()
+                    noConnectionToast.show()
                     swipeLayout.isRefreshing = false
                 }
             }
@@ -83,13 +85,14 @@ class FeedShowFragment(viewModel: FeedViewModel) : Fragment(),
 
     override fun onDestroyView() {
         super.onDestroyView()
+        noConnectionToast.cancel()
         binding = null
     }
 
     override fun onRefresh() {
         if (!isOnline(requireContext())) {
             swipeLayout.isRefreshing = false
-            Toast.makeText(activity, "No internet connection", Toast.LENGTH_SHORT).show()
+            noConnectionToast.show()
             return
         }
 

@@ -23,7 +23,7 @@ class FeedFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
 
         binding = FragmentFeedBinding.inflate(
@@ -46,8 +46,9 @@ class FeedFragment : Fragment() {
 
         viewPager.addOnPageChangeListener(object : ViewPager.OnPageChangeListener {
             override fun onPageScrolled(
-                position: Int, positionOffset: Float, positionOffsetPixels: Int
+                position: Int, positionOffset: Float, positionOffsetPixels: Int,
             ) {
+                return
             }
 
             override fun onPageSelected(position: Int) {
@@ -55,6 +56,7 @@ class FeedFragment : Fragment() {
             }
 
             override fun onPageScrollStateChanged(state: Int) {
+                return
             }
 
         })
@@ -85,7 +87,7 @@ class FeedFragment : Fragment() {
         fm: FragmentManager,
         behavior: Int,
         private val viewModel: FeedViewModel,
-        private val context: Context
+        private val context: Context,
     ) : FragmentPagerAdapter(fm, behavior) {
 
         override fun getItem(position: Int): Fragment {
