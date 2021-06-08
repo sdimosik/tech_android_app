@@ -9,7 +9,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 
 class Holder(
-    private val itemBinding: FavoriteInProfileAdapterBinding
+    private val itemBinding: FavoriteInProfileAdapterBinding,
 ) : RecyclerView.ViewHolder(itemBinding.root) {
 
     fun bindTo(item: FavoriteInProfileItemModel) {
@@ -23,14 +23,14 @@ private val differCallback = object :
     DiffUtil.ItemCallback<FavoriteInProfileItemModel>() {
     override fun areItemsTheSame(
         oldItem: FavoriteInProfileItemModel,
-        newItem: FavoriteInProfileItemModel
+        newItem: FavoriteInProfileItemModel,
     ): Boolean {
         return oldItem.someInfo == newItem.someInfo
     }
 
     override fun areContentsTheSame(
         oldItem: FavoriteInProfileItemModel,
-        newItem: FavoriteInProfileItemModel
+        newItem: FavoriteInProfileItemModel,
     ): Boolean {
         return oldItem == newItem
     }

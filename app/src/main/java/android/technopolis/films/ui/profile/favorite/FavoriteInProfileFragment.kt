@@ -15,7 +15,7 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.coroutines.launch
 
-class FavoriteInProfileFragment : Fragment(R.layout.fragment_favorite_in_profile) {
+class FavoriteInProfileFragment : Fragment() {
 
     private var binding: FragmentFavoriteInProfileBinding? = null
     private val filmsAdapter: FavoriteInProfileAdapter by lazy { FavoriteInProfileAdapter() }
@@ -23,7 +23,7 @@ class FavoriteInProfileFragment : Fragment(R.layout.fragment_favorite_in_profile
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         binding = FragmentFavoriteInProfileBinding.inflate(inflater, container, false)
         return binding!!.root

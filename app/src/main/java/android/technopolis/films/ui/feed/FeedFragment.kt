@@ -1,40 +1,28 @@
 package android.technopolis.films.ui.feed
 
-import android.graphics.Color
 import android.os.Bundle
 import android.technopolis.films.R
 import android.technopolis.films.databinding.FragmentFeedBinding
 import android.technopolis.films.ui.feed.film.FeedFilmFragment
 import android.technopolis.films.ui.feed.show.FeedShowFragment
-import android.technopolis.films.ui.profile.ProfileFragment
-import android.technopolis.films.ui.profile.favorite.FavoriteInProfileFragment
-import android.technopolis.films.ui.profile.info.InfoInProfileFragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.LinearLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.DividerItemDecoration
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-import androidx.viewpager.widget.PagerAdapter
 import androidx.viewpager.widget.ViewPager
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
 
-class FeedFragment : Fragment(R.layout.fragment_feed) {
+class FeedFragment : Fragment() {
 
     private var binding: FragmentFeedBinding? = null
     private val feedViewModel: FeedViewModel by activityViewModels()
-    
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
 
         binding = FragmentFeedBinding.inflate(
@@ -57,7 +45,7 @@ class FeedFragment : Fragment(R.layout.fragment_feed) {
 
         viewPager.addOnPageChangeListener(object : ViewPager.OnPageChangeListener {
             override fun onPageScrolled(
-                position: Int, positionOffset: Float, positionOffsetPixels: Int
+                position: Int, positionOffset: Float, positionOffsetPixels: Int,
             ) {
             }
 
@@ -97,7 +85,7 @@ class FeedFragment : Fragment(R.layout.fragment_feed) {
     class ViewPagerAdapter(
         fm: FragmentManager,
         behavior: Int,
-        feedViewModel: FeedViewModel
+        feedViewModel: FeedViewModel,
     ) : FragmentPagerAdapter(fm, behavior) {
 
         private val viewModel = feedViewModel

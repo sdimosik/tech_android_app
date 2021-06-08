@@ -8,21 +8,22 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
-class CalendarFragment : Fragment(R.layout.fragment_calendar) {
+class CalendarFragment : Fragment() {
 
     private var _binding: FragmentCalendarBinding? = null;
     private val binding get() = _binding!!
 
-    private lateinit var calendarViewModel: CalendarViewModel
+    private val calendarViewModel: CalendarViewModel by activityViewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
 
         _binding = FragmentCalendarBinding.inflate(
@@ -34,8 +35,6 @@ class CalendarFragment : Fragment(R.layout.fragment_calendar) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        calendarViewModel = (activity as MainActivity).calendarViewModel
 
         calendarViewModel.text
             .onEach { text ->

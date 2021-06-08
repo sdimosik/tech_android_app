@@ -11,11 +11,11 @@
         android:label="@string/title_watch"
         tools:layout="@layout/fragment_watch" />
 
-    <fragment
-        android:id="@id/navigation_calendar"
-        android:name="android.technopolis.films.ui.calendar.CalendarFragment"
-        android:label="@string/title_calendar"
-        tools:layout="@layout/fragment_calendar" />
+<!--    <fragment-->
+<!--        android:id="@id/navigation_calendar"-->
+<!--        android:name="android.technopolis.films.ui.calendar.CalendarFragment"-->
+<!--        android:label="@string/title_calendar"-->
+<!--        tools:layout="@layout/fragment_calendar" />-->
 
     <fragment
         android:id="@id/navigation_feed"
@@ -23,11 +23,11 @@
         android:label="@string/title_feed"
         tools:layout="@layout/fragment_feed" />
 
-    <fragment
-        android:id="@id/navigation_history"
-        android:name="android.technopolis.films.ui.history.HistoryFragment"
-        android:label="@string/title_history"
-        tools:layout="@layout/fragment_history" />
+<!--    <fragment-->
+<!--        android:id="@id/navigation_history"-->
+<!--        android:name="android.technopolis.films.ui.history.HistoryFragment"-->
+<!--        android:label="@string/title_history"-->
+<!--        tools:layout="@layout/fragment_history" />-->
 
     <fragment
         android:id="@id/navigation_profile"

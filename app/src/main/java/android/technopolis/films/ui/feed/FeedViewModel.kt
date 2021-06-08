@@ -1,15 +1,12 @@
 package android.technopolis.films.ui.feed
 
-import android.os.Bundle
 import android.os.Parcelable
 import android.technopolis.films.api.model.media.MediaType
 import android.technopolis.films.repository.MainRepository
-import android.widget.SearchView
 import androidx.lifecycle.ViewModel
 
-class FeedViewModel(
-    private val mainRepository: MainRepository
-) : ViewModel() {
+class FeedViewModel : ViewModel() {
+    private val mainRepository = MainRepository()
 
     private var positionMovie: Parcelable? = null
     private var isLoadMovie = false

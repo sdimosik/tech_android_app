@@ -7,7 +7,9 @@ import android.technopolis.films.api.model.media.MediaType
 import android.technopolis.films.api.model.users.stats.UserStats
 import android.technopolis.films.api.model.media.Media
 import android.technopolis.films.api.model.users.settings.UserSettings
+import androidx.lifecycle.MutableLiveData
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
 interface Repository {
@@ -19,10 +21,10 @@ interface Repository {
 
     /*============================================================================================*/
 
-    val moviesWatchList: Flow<MutableList<Media>>
-    val moviesWatchListLoading: StateFlow<Boolean>
-    val showsWatchList: Flow<MutableList<Media>>
-    val showsWatchListLoading: StateFlow<Boolean>
+    val moviesWatchList: MutableLiveData<MutableList<Media>>
+    val moviesWatchListLoading: MutableStateFlow<Boolean>
+    val showsWatchList: MutableLiveData<MutableList<Media>>
+    val showsWatchListLoading: MutableStateFlow<Boolean>
     fun getWatchList(type: MediaType)
     fun updateWatchList(type: MediaType)
 
