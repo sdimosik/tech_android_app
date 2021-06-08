@@ -1,5 +1,6 @@
 package android.technopolis.films.ui.feed
 
+import android.content.Context
 import android.os.Bundle
 import android.technopolis.films.R
 import android.technopolis.films.databinding.FragmentFeedBinding
@@ -14,7 +15,7 @@ import androidx.fragment.app.FragmentPagerAdapter
 import androidx.fragment.app.activityViewModels
 import androidx.viewpager.widget.ViewPager
 
-class FeedFragment : Fragment() {
+class FeedFragment : Fragment(R.layout.fragment_feed) {
 
     private var binding: FragmentFeedBinding? = null
     private val feedViewModel: FeedViewModel by activityViewModels()
@@ -22,7 +23,7 @@ class FeedFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?,
+        savedInstanceState: Bundle?
     ): View {
 
         binding = FragmentFeedBinding.inflate(
@@ -35,7 +36,7 @@ class FeedFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val adapter = ViewPagerAdapter(childFragmentManager, 0, feedViewModel)
+        val adapter = context?.let { ViewPagerAdapter(childFragmentManager, 0, feedViewModel, it) }
         val viewPager = binding?.viewPager!!
         viewPager.adapter = adapter
         viewPager.currentItem = feedViewModel.getStateViewPager()!!
@@ -45,7 +46,7 @@ class FeedFragment : Fragment() {
 
         viewPager.addOnPageChangeListener(object : ViewPager.OnPageChangeListener {
             override fun onPageScrolled(
-                position: Int, positionOffset: Float, positionOffsetPixels: Int,
+                position: Int, positionOffset: Float, positionOffsetPixels: Int
             ) {
             }
 
@@ -63,11 +64,9 @@ class FeedFragment : Fragment() {
         /*binding?.recyclerView?.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
-
                 val searchView = binding?.searchView!!
                 val animShow = AnimationUtils.loadAnimation(searchView.context, R.anim.view_show);
                 val animHide = AnimationUtils.loadAnimation(searchView.context, R.anim.view_hide);
-
                 if (dy > 10 && searchView.visibility == View.VISIBLE) {
                     searchView.visibility = View.GONE
                 } else if (dy < -10 && searchView.visibility != View.VISIBLE) {
@@ -85,10 +84,9 @@ class FeedFragment : Fragment() {
     class ViewPagerAdapter(
         fm: FragmentManager,
         behavior: Int,
-        feedViewModel: FeedViewModel,
+        private val viewModel: FeedViewModel,
+        private val context: Context
     ) : FragmentPagerAdapter(fm, behavior) {
-
-        private val viewModel = feedViewModel
 
         override fun getItem(position: Int): Fragment {
             return when (position) {
@@ -98,21 +96,18 @@ class FeedFragment : Fragment() {
         }
 
         override fun getPageTitle(position: Int): CharSequence {
-            return when (position) {
-                0 -> "FILMS"
-                else -> "SHOWS"
-            }
+            return context.resources.getString(INFO_TITLES[position])
         }
 
         override fun getCount(): Int {
             return INFO_TITLES.size
         }
-    }
 
-    companion object {
-        private val INFO_TITLES = arrayOf(
-            R.layout.fragment_feed_film,
-            R.layout.fragment_feed_show
-        )
+        companion object {
+            private val INFO_TITLES = arrayOf(
+                R.string.feed__tab_layout__film_tab_name,
+                R.string.feed__tab_layout__show_tab_name
+            )
+        }
     }
 }
