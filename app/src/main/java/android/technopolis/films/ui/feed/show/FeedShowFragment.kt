@@ -6,10 +6,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.technopolis.films.R
+import android.technopolis.films.utils.Utils.isOnline
 import android.technopolis.films.databinding.FragmentFeedShowBinding
 import android.technopolis.films.ui.feed.FeedAdapter
 import android.technopolis.films.ui.feed.FeedViewModel
 import android.widget.LinearLayout
+import android.widget.Toast
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
@@ -42,7 +44,12 @@ class FeedShowFragment(viewModel: FeedViewModel) : Fragment(),
         swipeLayout.post {
             if (!feedViewModel.isLoadShow()) {
                 swipeLayout.isRefreshing = true
-                feedViewModel.updateRecommendationsShows()
+                if (isOnline(requireContext())) {
+                    feedViewModel.updateRecommendationsShows()
+                } else {
+                    Toast.makeText(activity, "No internet connection", Toast.LENGTH_SHORT).show()
+                    swipeLayout.isRefreshing = false
+                }
             }
         }
 
@@ -80,6 +87,12 @@ class FeedShowFragment(viewModel: FeedViewModel) : Fragment(),
     }
 
     override fun onRefresh() {
+        if (!isOnline(requireContext())) {
+            swipeLayout.isRefreshing = false
+            Toast.makeText(activity, "No internet connection", Toast.LENGTH_SHORT).show()
+            return
+        }
+
         swipeLayout.isRefreshing = true
         feedViewModel.updateRecommendationsShows()
     }

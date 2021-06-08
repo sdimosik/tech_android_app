@@ -1,29 +1,27 @@
 package android.technopolis.films.ui.profile
 
-import android.annotation.SuppressLint
 import android.graphics.Color
 import android.os.Bundle
 import android.technopolis.films.api.trakt.model.users.settings.UserSettings
+import android.technopolis.films.utils.Utils.isOnline
 import android.technopolis.films.databinding.FragmentProfileBinding
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import android.widget.ImageView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.squareup.picasso.Picasso
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.launch
 
 class ProfileFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     private var binding: FragmentProfileBinding? = null
-    private val viewModel: ProfileViewModel by activityViewModels()
+    private val profileViewModel: ProfileViewModel by activityViewModels()
     private lateinit var swipeLayout: SwipeRefreshLayout
 
     private lateinit var settings: UserSettings
@@ -40,13 +38,18 @@ class ProfileFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         swipeLayout.setColorSchemeColors(Color.BLUE)
 
         swipeLayout.post {
-            if (!viewModel.isLoadProfile()) {
-                swipeLayout.isRefreshing = true
-                viewModel.updateUserSetting()
+            if (!profileViewModel.isLoadProfile()) {
+                if (isOnline(requireContext())) {
+                    swipeLayout.isRefreshing = true
+                    profileViewModel.updateUserSetting()
+                } else {
+                    Toast.makeText(activity, "No internet connection", Toast.LENGTH_SHORT).show()
+                    swipeLayout.isRefreshing = false
+                }
             }
         }
 
-        viewModel.observeSettings().onEach {
+        profileViewModel.observeSettings().onEach {
             loadPicture(binding!!.imageProfile, it.user?.images?.avatar?.full!!)
         }.launchIn(MainScope())
 
@@ -59,9 +62,8 @@ class ProfileFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         subscribeDataCallBack()
     }
 
-    @SuppressLint("SetTextI18n")
     private fun subscribeDataCallBack() {
-        viewModel.getUserSetting().onEach {
+        profileViewModel.getUserSetting().onEach {
             binding?.nameProfile?.text = it.user?.username
             binding?.fullName?.text = it.user?.name
             binding?.location?.text = it.user?.location
@@ -84,8 +86,13 @@ class ProfileFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     }
 
     override fun onRefresh() {
+        if (!isOnline(requireContext())) {
+            swipeLayout.isRefreshing = false
+            Toast.makeText(activity, "No internet connection", Toast.LENGTH_SHORT).show()
+            return
+        }
         swipeLayout.isRefreshing = true
-        viewModel.updateUserSetting()
+        profileViewModel.updateUserSetting()
     }
 
     companion object{
