@@ -1,21 +1,21 @@
 package android.technopolis.films.ui.feed.show
 
 import android.os.Bundle
+import androidx.fragment.app.Fragment
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.technopolis.films.R
 import android.technopolis.films.utils.Utils.isOnline
 import android.technopolis.films.databinding.FragmentFeedShowBinding
 import android.technopolis.films.ui.feed.FeedAdapter
 import android.technopolis.films.ui.feed.FeedViewModel
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.Toast
-import androidx.fragment.app.Fragment
-import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
@@ -27,6 +27,7 @@ class FeedShowFragment(viewModel: FeedViewModel) : Fragment(),
     private val feedViewModel = viewModel
     private var recyclerViewLayoutManager = LinearLayoutManager(activity)
     private lateinit var swipeLayout: SwipeRefreshLayout
+    private lateinit var noConnectionToast: Toast
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -36,7 +37,8 @@ class FeedShowFragment(viewModel: FeedViewModel) : Fragment(),
         binding = FragmentFeedShowBinding.inflate(
             inflater, container, false
         )
-
+        noConnectionToast =
+            Toast.makeText(activity, getString(R.string.no_connection), Toast.LENGTH_SHORT)
         swipeLayout = binding?.swipeContainer!!
         swipeLayout.setOnRefreshListener(this)
         swipeLayout.setColorSchemeColors(resources.getColor(R.color.purple_500))
@@ -47,7 +49,7 @@ class FeedShowFragment(viewModel: FeedViewModel) : Fragment(),
                 if (isOnline(requireContext())) {
                     feedViewModel.updateRecommendationsShows()
                 } else {
-                    Toast.makeText(activity, "No internet connection", Toast.LENGTH_SHORT).show()
+                    noConnectionToast.show()
                     swipeLayout.isRefreshing = false
                 }
             }
@@ -78,18 +80,19 @@ class FeedShowFragment(viewModel: FeedViewModel) : Fragment(),
         feedViewModel.showsRecommendations().onEach {
             feedAdapter.differ.submitList(it)
             swipeLayout.isRefreshing = false
-        }.launchIn(lifecycleScope)
+        }.launchIn(MainScope())
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
+        noConnectionToast.cancel()
         binding = null
     }
 
     override fun onRefresh() {
         if (!isOnline(requireContext())) {
             swipeLayout.isRefreshing = false
-            Toast.makeText(activity, "No internet connection", Toast.LENGTH_SHORT).show()
+            noConnectionToast.show()
             return
         }
 

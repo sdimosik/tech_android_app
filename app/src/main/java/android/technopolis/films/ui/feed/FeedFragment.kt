@@ -15,7 +15,7 @@ import androidx.fragment.app.FragmentPagerAdapter
 import androidx.fragment.app.activityViewModels
 import androidx.viewpager.widget.ViewPager
 
-class FeedFragment : Fragment(R.layout.fragment_feed) {
+class FeedFragment : Fragment() {
 
     private var binding: FragmentFeedBinding? = null
     private val feedViewModel: FeedViewModel by activityViewModels()
@@ -23,7 +23,7 @@ class FeedFragment : Fragment(R.layout.fragment_feed) {
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
 
         binding = FragmentFeedBinding.inflate(
@@ -46,8 +46,9 @@ class FeedFragment : Fragment(R.layout.fragment_feed) {
 
         viewPager.addOnPageChangeListener(object : ViewPager.OnPageChangeListener {
             override fun onPageScrolled(
-                position: Int, positionOffset: Float, positionOffsetPixels: Int
+                position: Int, positionOffset: Float, positionOffsetPixels: Int,
             ) {
+                return
             }
 
             override fun onPageSelected(position: Int) {
@@ -55,6 +56,7 @@ class FeedFragment : Fragment(R.layout.fragment_feed) {
             }
 
             override fun onPageScrollStateChanged(state: Int) {
+                return
             }
 
         })
@@ -85,7 +87,7 @@ class FeedFragment : Fragment(R.layout.fragment_feed) {
         fm: FragmentManager,
         behavior: Int,
         private val viewModel: FeedViewModel,
-        private val context: Context
+        private val context: Context,
     ) : FragmentPagerAdapter(fm, behavior) {
 
         override fun getItem(position: Int): Fragment {

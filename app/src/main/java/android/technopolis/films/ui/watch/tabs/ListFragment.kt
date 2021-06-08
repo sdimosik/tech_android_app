@@ -12,6 +12,7 @@ import android.technopolis.films.ui.watch.rvMediaHolder.MediaAdapter
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.DividerItemDecoration
@@ -75,6 +76,7 @@ class ListFragment : Fragment() {
         super.onDestroyView()
         badConnectionSandbar.dismiss()
         noConnectionSandbar.dismiss()
+        noConnectionToast.cancel()
 
         binding?.mediaListRecyclerView?.removeOnScrollListener(onScrollListener)
         binding = null
@@ -91,6 +93,7 @@ class ListFragment : Fragment() {
 
     private lateinit var badConnectionSandbar: Snackbar
     private lateinit var noConnectionSandbar: Snackbar
+    private lateinit var noConnectionToast: Toast
 
     private fun setupRecyclerView() {
         binding?.mediaListRecyclerView?.apply {
@@ -127,16 +130,23 @@ class ListFragment : Fragment() {
             .setAnchorView(navView)
             .setBackgroundTint(resources.getColor(R.color.bad_connection_snackar_background))
             .setTextColor(resources.getColor(R.color.bad_connection_snackar_text))
+
+        noConnectionToast =
+            Toast.makeText(activity, getString(R.string.no_connection), Toast.LENGTH_SHORT)
+//        noConnectionToast.setGravity(R.id.navigation_feed, 0, 0)
     }
 
     private fun observeNetworkStatus() {
         if (!networkState.value) {
-            noConnectionSandbar.show()
+            noConnectionToast.show()
+//            noConnectionSandbar.show()
         }
         networkState.onEach {
             if (!it) {
-                noConnectionSandbar.show()
+                noConnectionToast.show()
+//                noConnectionSandbar.show()
             } else if (noConnectionSandbar.isShown) {
+                noConnectionToast.cancel()
                 noConnectionSandbar.dismiss()
             }
         }.launchIn(MainScope())

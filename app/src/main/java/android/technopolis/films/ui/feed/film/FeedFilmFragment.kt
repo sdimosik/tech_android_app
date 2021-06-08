@@ -12,10 +12,10 @@ import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
@@ -28,6 +28,8 @@ class FeedFilmFragment(viewModel: FeedViewModel) : Fragment(),
     private val feedViewModel = viewModel
     private var recyclerViewLayoutManager = LinearLayoutManager(activity)
     private lateinit var swipeLayout: SwipeRefreshLayout
+
+    private lateinit var noConnectionToast: Toast
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -42,13 +44,16 @@ class FeedFilmFragment(viewModel: FeedViewModel) : Fragment(),
         swipeLayout.setOnRefreshListener(this)
         swipeLayout.setColorSchemeColors(resources.getColor(R.color.purple_500))
 
+        noConnectionToast =
+            Toast.makeText(activity, getString(R.string.no_connection), Toast.LENGTH_SHORT)
+
         swipeLayout.post {
             if (!feedViewModel.isLoadMovie()) {
                 swipeLayout.isRefreshing = true
                 if (isOnline(requireContext())) {
                     feedViewModel.updateRecommendationsMovies()
                 } else {
-                    Toast.makeText(activity, "No internet connection", Toast.LENGTH_SHORT).show()
+                    noConnectionToast.show()
                     swipeLayout.isRefreshing = false
                 }
             }
@@ -79,18 +84,19 @@ class FeedFilmFragment(viewModel: FeedViewModel) : Fragment(),
         feedViewModel.moviesRecommendations().onEach {
             feedAdapter.differ.submitList(it)
             swipeLayout.isRefreshing = false
-        }.launchIn(lifecycleScope)
+        }.launchIn(MainScope())
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
+        noConnectionToast.cancel()
         binding = null
     }
 
     override fun onRefresh() {
         if (!isOnline(requireContext())) {
             swipeLayout.isRefreshing = false
-            Toast.makeText(activity, "No internet connection", Toast.LENGTH_SHORT).show()
+            noConnectionToast.show()
             return
         }
         swipeLayout.isRefreshing = true

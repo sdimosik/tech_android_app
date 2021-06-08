@@ -13,7 +13,6 @@ import android.technopolis.films.api.trakt.model.media.SortType
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.asFlow
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.Flow
@@ -52,7 +51,7 @@ class MainRepository : Repository {
         ignoreCollected: Boolean,
         config: ConfigImpl,
     ) {
-        MainScope().launch(Dispatchers.IO) {
+        MainScope().launch() {
             config.recommendationsLoading.value = true
             val recommendations = client.getRecommendations(
                 type,
@@ -83,7 +82,7 @@ class MainRepository : Repository {
     /*____________________________________________________________________________________________*/
 
     override fun getWatchList(type: MediaType) {
-        MainScope().launch(Dispatchers.IO) {
+        MainScope().launch {
             val c = config.getConfig(type)
             if (c.watchListLoadingMutex.isLocked || c.watchListLoading.value) {
                 cancel()
@@ -119,7 +118,7 @@ class MainRepository : Repository {
         config: ConfigImpl,
         id: String,
     ) {
-        MainScope().launch(Dispatchers.IO) {
+        MainScope().launch {
             println("getWatchList(): try to get data")
             if (config.isWatchListEnded.value) {
                 cancel()
@@ -185,7 +184,7 @@ class MainRepository : Repository {
         }
 
         config.currentHistoryPage.value += 1
-        MainScope().launch(Dispatchers.IO) {
+        MainScope().launch {
             config.historyLoading.value = true
             val watchHistory = client.getWatchedHistory(
                 id,
@@ -217,7 +216,7 @@ class MainRepository : Repository {
     override val stats: Flow<UserStats?> = _stats.asFlow()
 
     override fun getStats(id: String) {
-        MainScope().launch(Dispatchers.IO) {
+        MainScope().launch {
             _statsLoading.value = true
             _stats.value = client.getStats(id)
             _statsLoading.value = false
@@ -251,7 +250,7 @@ class MainRepository : Repository {
         days: Int,
         config: ConfigImpl,
     ) {
-        MainScope().launch(Dispatchers.IO) {
+        MainScope().launch {
             config.calendarLoading.value = true
             val calendar = client.getMyCalendar(type, startDate, days)
             config.calendar.value!!.apply {
@@ -270,7 +269,7 @@ class MainRepository : Repository {
     override val userSettings: Flow<UserSettings> = _userSettings.asFlow()
 
     override fun getUserSettings() {
-        MainScope().launch(Dispatchers.IO) {
+        MainScope().launch {
             _userSettingsLoading.value = true
             _userSettings.postValue(client.getUserSettings())
             _userSettingsLoading.value = false

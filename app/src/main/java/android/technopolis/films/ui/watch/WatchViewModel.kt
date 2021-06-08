@@ -16,17 +16,15 @@ class WatchViewModel : ViewModel() {
     private var _tabArgs = Bundle()
     val tabArgs get() = _tabArgs
 
-    private val _text = MutableStateFlow("This is watch Fragment")
-    val text: StateFlow<String> = _text.asStateFlow()
-
     private var _networkState: MutableStateFlow<Boolean> = MutableStateFlow(false)
     var networkState = _networkState.asStateFlow()
-
 
     private val repository: Repository = MainRepository()
 
     fun getMoreData(type: MediaType) {
-        repository.getWatchList(type)
+        if(networkState.value) {
+            repository.getWatchList(type)
+        }
     }
 
     fun observeListStatus(type: MediaType): StateFlow<Boolean> {
@@ -49,7 +47,7 @@ class WatchViewModel : ViewModel() {
                 repository.showsWatchList
             }
         }
-        if (list.value!!.isEmpty()) {
+        if (list.value!!.isEmpty() && networkState.value) {
             repository.getWatchList(type)
         }
         return list.asFlow()
@@ -64,7 +62,9 @@ class WatchViewModel : ViewModel() {
     }
 
     fun updateList(type: MediaType) {
-        repository.updateWatchList(type)
+        if(networkState.value) {
+            repository.updateWatchList(type)
+        }
     }
 
     fun setNetworkState(state: Boolean) {

@@ -3,30 +3,34 @@ package android.technopolis.films.ui.profile
 import android.graphics.Color
 import android.os.Bundle
 import android.technopolis.films.R
+import android.technopolis.films.api.trakt.model.users.settings.UserSettings
 import android.technopolis.films.utils.Utils.isOnline
 import android.technopolis.films.databinding.FragmentProfileBinding
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import android.widget.ImageView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import com.squareup.picasso.Picasso
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
-class ProfileFragment : Fragment(R.layout.fragment_profile),
-    SwipeRefreshLayout.OnRefreshListener {
-
+class ProfileFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     private var binding: FragmentProfileBinding? = null
     private val profileViewModel: ProfileViewModel by activityViewModels()
     private lateinit var swipeLayout: SwipeRefreshLayout
 
+    private lateinit var settings: UserSettings
+    private lateinit var noConnectionToast: Toast
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         binding = FragmentProfileBinding.inflate(inflater, container, false)
 
@@ -40,11 +44,17 @@ class ProfileFragment : Fragment(R.layout.fragment_profile),
                     swipeLayout.isRefreshing = true
                     profileViewModel.updateUserSetting()
                 } else {
-                    Toast.makeText(activity, "No internet connection", Toast.LENGTH_SHORT).show()
+                    noConnectionToast.show()
                     swipeLayout.isRefreshing = false
                 }
             }
         }
+
+        profileViewModel.observeSettings().onEach {
+            if(isOnline(requireContext())) {
+                loadPicture(binding!!.imageProfile, it.user?.images?.avatar?.full!!)
+            }
+        }.launchIn(lifecycleScope)
 
         return binding!!.root
     }
@@ -52,6 +62,8 @@ class ProfileFragment : Fragment(R.layout.fragment_profile),
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        noConnectionToast =
+            Toast.makeText(activity, getString(R.string.no_connection), Toast.LENGTH_SHORT)
         subscribeDataCallBack()
     }
 
@@ -75,16 +87,23 @@ class ProfileFragment : Fragment(R.layout.fragment_profile),
 
     override fun onDestroyView() {
         super.onDestroyView()
+        noConnectionToast.cancel()
         binding = null
     }
 
     override fun onRefresh() {
         if (!isOnline(requireContext())) {
             swipeLayout.isRefreshing = false
-            Toast.makeText(activity, "No internet connection", Toast.LENGTH_SHORT).show()
+            noConnectionToast.show()
             return
         }
         swipeLayout.isRefreshing = true
         profileViewModel.updateUserSetting()
+    }
+
+    companion object {
+        fun loadPicture(imageView: ImageView, url: String) {
+            Picasso.get().load(url).into(imageView)
+        }
     }
 }
