@@ -2,7 +2,7 @@ package android.technopolis.films.ui.feed.show
 
 import android.os.Bundle
 import android.technopolis.films.R
-import android.technopolis.films.Utils.isOnline
+import android.technopolis.films.utils.Utils.isOnline
 import android.technopolis.films.databinding.FragmentFeedShowBinding
 import android.technopolis.films.ui.feed.FeedAdapter
 import android.technopolis.films.ui.feed.FeedViewModel

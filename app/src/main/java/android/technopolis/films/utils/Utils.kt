@@ -1,4 +1,4 @@
-package android.technopolis.films
+package android.technopolis.films.utils
 
 import android.content.Context
 import android.net.ConnectivityManager

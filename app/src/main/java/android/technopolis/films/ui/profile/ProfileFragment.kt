@@ -1,10 +1,9 @@
 package android.technopolis.films.ui.profile
 
-import android.annotation.SuppressLint
 import android.graphics.Color
 import android.os.Bundle
 import android.technopolis.films.R
-import android.technopolis.films.Utils.isOnline
+import android.technopolis.films.utils.Utils.isOnline
 import android.technopolis.films.databinding.FragmentProfileBinding
 import android.view.LayoutInflater
 import android.view.View
