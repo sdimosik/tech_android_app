@@ -2,8 +2,8 @@ package android.technopolis.films.ui.base
 
 import android.os.Bundle
 import android.technopolis.films.R
-import android.technopolis.films.api.ApiConfig
-import android.technopolis.films.api.TraktClientGenerator
+import android.technopolis.films.api.trakt.TraktApiConfig
+import android.technopolis.films.api.trakt.TraktClientGenerator
 import android.technopolis.films.databinding.ActivityMainBinding
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.NavController
@@ -29,7 +29,7 @@ class MainActivity : AppCompatActivity() {
             val code = ""//todo
             TraktClientGenerator.doLogin(code)
             while (true) {
-                if (ApiConfig.token != null) {
+                if (TraktApiConfig.token != null) {
                     break
                 }
             }

@@ -1,27 +1,35 @@
 package android.technopolis.films.ui.feed
 
-import android.technopolis.films.api.model.media.CommonMediaItem
+import android.technopolis.films.api.trakt.model.media.CommonMediaItem
 import android.technopolis.films.databinding.FeedSubAdapterItemBinding
+import android.technopolis.films.databinding.MediaHolderBinding
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.appcompat.widget.AppCompatImageView
+import androidx.appcompat.widget.AppCompatTextView
 import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.squareup.picasso.Picasso
 
 class FeedAdapterHolder(
-    private val itemBinding: FeedSubAdapterItemBinding,
+    private val itemBinding: MediaHolderBinding,
 ) : RecyclerView.ViewHolder(itemBinding.root) {
+    private val ivImage: AppCompatImageView = itemBinding.mediaHolderMediaImage
+    private val tvName: AppCompatTextView = itemBinding.mediaHolderMediaName
+    private val tvDescription: AppCompatTextView = itemBinding.mediaHolderMediaDescription
 
     fun bindTo(item: CommonMediaItem) {
         itemView.apply {
             if (true) {
-                itemBinding.name.text = item.title
-                itemBinding.someInfo.text = item.year.toString()
+                tvName.text = item.title
+                tvDescription.text = item.year.toString()
             } else {
-                itemBinding.name.text = item.title
-                itemBinding.someInfo.text = item.year.toString()
+                tvName.text = item.title
+                tvDescription.text = item.year.toString()
             }
+            Picasso.get().load(item.mediaUrl).into(ivImage)
         }
     }
 }
@@ -49,7 +57,7 @@ class FeedAdapter : ListAdapter<CommonMediaItem, FeedAdapterHolder>(differCallba
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FeedAdapterHolder {
         return FeedAdapterHolder(
-            FeedSubAdapterItemBinding.inflate(
+            MediaHolderBinding.inflate(
                 LayoutInflater.from(parent.context),
                 parent,
                 false

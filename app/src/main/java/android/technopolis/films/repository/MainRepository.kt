@@ -1,28 +1,29 @@
 package android.technopolis.films.repository
 
-import android.technopolis.films.api.Trakt
-import android.technopolis.films.api.TraktClientGenerator
-import android.technopolis.films.api.model.media.*
-import android.technopolis.films.api.model.users.settings.UserSettings
-import android.technopolis.films.api.model.users.stats.UserStats
+import android.technopolis.films.api.trakt.Trakt
+import android.technopolis.films.api.trakt.TraktClientGenerator
+import android.technopolis.films.api.trakt.model.media.CalendarItem
+import android.technopolis.films.api.trakt.model.users.settings.UserSettings
+import android.technopolis.films.api.trakt.model.users.stats.UserStats
+import android.technopolis.films.api.trakt.model.media.CommonMediaItem
+import android.technopolis.films.api.trakt.model.media.HistoryItem
+import android.technopolis.films.api.trakt.model.media.Media
+import android.technopolis.films.api.trakt.model.media.MediaType
+import android.technopolis.films.api.trakt.model.media.SortType
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.asFlow
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.withLock
-import okhttp3.internal.checkOffsetAndCount
-import okhttp3.internal.wait
 
 
 class MainRepository : Repository {

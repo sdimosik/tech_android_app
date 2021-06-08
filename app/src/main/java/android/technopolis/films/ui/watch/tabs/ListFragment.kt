@@ -1,11 +1,10 @@
 package android.technopolis.films.ui.watch.tabs
 
-import android.content.res.Resources
 import android.os.Bundle
 import android.os.Parcelable
 import android.technopolis.films.R
-import android.technopolis.films.api.model.media.Media
-import android.technopolis.films.api.model.media.MediaType
+import android.technopolis.films.api.trakt.model.media.Media
+import android.technopolis.films.api.trakt.model.media.MediaType
 import android.technopolis.films.databinding.FragmentListBinding
 import android.technopolis.films.ui.base.MainActivity
 import android.technopolis.films.ui.watch.WatchViewModel
@@ -23,13 +22,10 @@ import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.onEmpty
-import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 
 class ListFragment : Fragment() {

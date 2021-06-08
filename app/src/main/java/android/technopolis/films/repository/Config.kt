@@ -1,6 +1,6 @@
 package android.technopolis.films.repository
 
-import android.technopolis.films.api.model.media.MediaType
+import android.technopolis.films.api.trakt.model.media.MediaType
 
 class Config {
     private val moviesConfig = ConfigImpl()

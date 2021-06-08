@@ -1,12 +1,12 @@
 package android.technopolis.films.repository
 
-import android.technopolis.films.api.model.media.CalendarItem
-import android.technopolis.films.api.model.media.CommonMediaItem
-import android.technopolis.films.api.model.media.HistoryItem
-import android.technopolis.films.api.model.media.MediaType
-import android.technopolis.films.api.model.users.stats.UserStats
-import android.technopolis.films.api.model.media.Media
-import android.technopolis.films.api.model.users.settings.UserSettings
+import android.technopolis.films.api.trakt.model.media.CalendarItem
+import android.technopolis.films.api.trakt.model.media.CommonMediaItem
+import android.technopolis.films.api.trakt.model.media.HistoryItem
+import android.technopolis.films.api.trakt.model.media.MediaType
+import android.technopolis.films.api.trakt.model.users.stats.UserStats
+import android.technopolis.films.api.trakt.model.media.Media
+import android.technopolis.films.api.trakt.model.users.settings.UserSettings
 import androidx.lifecycle.MutableLiveData
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
