@@ -16,12 +16,8 @@ class WatchViewModel : ViewModel() {
     private var _tabArgs = Bundle()
     val tabArgs get() = _tabArgs
 
-    private val _text = MutableStateFlow("This is watch Fragment")
-    val text: StateFlow<String> = _text.asStateFlow()
-
     private var _networkState: MutableStateFlow<Boolean> = MutableStateFlow(false)
     var networkState = _networkState.asStateFlow()
-
 
     private val repository: Repository = MainRepository()
 

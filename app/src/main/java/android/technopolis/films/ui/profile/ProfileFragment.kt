@@ -3,29 +3,35 @@ package android.technopolis.films.ui.profile
 import android.annotation.SuppressLint
 import android.graphics.Color
 import android.os.Bundle
-import android.technopolis.films.R
+import android.technopolis.films.api.trakt.model.users.settings.UserSettings
 import android.technopolis.films.databinding.FragmentProfileBinding
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import com.squareup.picasso.Picasso
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 
-class ProfileFragment : Fragment(R.layout.fragment_profile),
-    SwipeRefreshLayout.OnRefreshListener {
-
+class ProfileFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     private var binding: FragmentProfileBinding? = null
-    private val profileViewModel: ProfileViewModel by activityViewModels()
+    private val viewModel: ProfileViewModel by activityViewModels()
     private lateinit var swipeLayout: SwipeRefreshLayout
+
+    private lateinit var settings: UserSettings
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         binding = FragmentProfileBinding.inflate(inflater, container, false)
 
@@ -34,11 +40,16 @@ class ProfileFragment : Fragment(R.layout.fragment_profile),
         swipeLayout.setColorSchemeColors(Color.BLUE)
 
         swipeLayout.post {
-            if (!profileViewModel.isLoadProfile()) {
+            if (!viewModel.isLoadProfile()) {
                 swipeLayout.isRefreshing = true
-                profileViewModel.updateUserSetting()
+                viewModel.updateUserSetting()
             }
         }
+
+        viewModel.settings.onEach {
+            settings = it
+            loadPicture(binding!!.imageProfile, settings.user?.images?.avatar?.full!!)
+        }.launchIn(MainScope())
 
         return binding!!.root
     }
@@ -51,7 +62,7 @@ class ProfileFragment : Fragment(R.layout.fragment_profile),
 
     @SuppressLint("SetTextI18n")
     private fun subscribeDataCallBack() {
-        profileViewModel.getUserSetting().onEach {
+        viewModel.getUserSetting().onEach {
             binding?.nameProfile?.text = it.user?.username
             binding?.fullName?.text = it.user?.name
             binding?.location?.text = it.user?.location
@@ -75,6 +86,12 @@ class ProfileFragment : Fragment(R.layout.fragment_profile),
 
     override fun onRefresh() {
         swipeLayout.isRefreshing = true
-        profileViewModel.updateUserSetting()
+        viewModel.updateUserSetting()
+    }
+
+    companion object{
+        fun loadPicture(imageView: ImageView, url: String){
+            Picasso.get().load(url).into(imageView)
+        }
     }
 }

@@ -1,10 +1,16 @@
 package android.technopolis.films.ui.profile
 
+import android.technopolis.films.api.trakt.model.users.settings.UserSettings
+import android.technopolis.films.api.trakt.model.users.stats.UserStats
 import android.technopolis.films.repository.MainRepository
 import androidx.lifecycle.ViewModel
+import kotlinx.coroutines.flow.Flow
 
 class ProfileViewModel : ViewModel() {
-    private val mainRepository = MainRepository()
+    private val repository = MainRepository()
+
+    val stats: Flow<UserStats?> = repository.stats
+    val settings: Flow<UserSettings> = repository.userSettings
 
     private var positionViewPager: Int? = 0
 
@@ -21,9 +27,9 @@ class ProfileViewModel : ViewModel() {
     }
 
     fun updateUserSetting() {
-        mainRepository.getUserSettings()
+        repository.getUserSettings()
         isLoadProfile = true
     }
 
-    fun getUserSetting() = mainRepository.userSettings
+    fun getUserSetting() = repository.userSettings
 }
