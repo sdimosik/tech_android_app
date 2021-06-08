@@ -134,6 +134,8 @@ class ListFragment : Fragment() {
 
         noConnectionToast =
             Toast.makeText(activity, getString(R.string.no_connection), Toast.LENGTH_SHORT)
+        noConnectionToast.setGravity(Gravity.CENTER, 0, 0)
+
     }
 
     private fun observeNetworkStatus() {
