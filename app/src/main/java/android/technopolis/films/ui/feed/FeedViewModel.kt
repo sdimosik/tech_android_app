@@ -1,10 +1,8 @@
 package android.technopolis.films.ui.feed
 
-import android.os.Bundle
 import android.os.Parcelable
 import android.technopolis.films.api.model.media.MediaType
 import android.technopolis.films.repository.MainRepository
-import android.widget.SearchView
 import androidx.lifecycle.ViewModel
 
 class FeedViewModel(

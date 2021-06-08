@@ -5,14 +5,10 @@ import android.graphics.Color
 import android.os.Bundle
 import android.technopolis.films.R
 import android.technopolis.films.databinding.FragmentProfileBinding
-import android.technopolis.films.ui.profile.favorite.FavoriteInProfileFragment
-import android.technopolis.films.ui.profile.info.InfoInProfileFragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentManager
-import androidx.fragment.app.FragmentPagerAdapter
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
@@ -51,36 +47,13 @@ class ProfileFragment : Fragment(R.layout.fragment_profile),
         super.onViewCreated(view, savedInstanceState)
 
         subscribeDataCallBack()
-
-        /*val adapter = ViewPagerAdapter(childFragmentManager, 0)
-        val viewPager = binding?.viewPager!!
-        viewPager.adapter = adapter
-        viewPager.currentItem = profileViewModel.getStateViewPager()!!
-
-        val tabLayout = binding?.fragmentProfileTabLayout!!
-        tabLayout.setupWithViewPager(viewPager)
-
-        viewPager.addOnPageChangeListener(object : ViewPager.OnPageChangeListener {
-            override fun onPageScrolled(
-                position: Int, positionOffset: Float, positionOffsetPixels: Int
-            ) {
-            }
-
-            override fun onPageSelected(position: Int) {
-                profileViewModel.saveStateViewPager(position)
-            }
-
-            override fun onPageScrollStateChanged(state: Int) {
-            }
-
-        })*/
     }
 
     @SuppressLint("SetTextI18n")
     private fun subscribeDataCallBack() {
         profileViewModel.getUserSetting().onEach {
             binding?.nameProfile?.text = it.user?.username
-            binding?.someStat1?.text = it.user?.name
+            binding?.fullName?.text = it.user?.name
             binding?.location?.text = it.user?.location
 
             binding?.facebook?.setTextColor(if (it.connections?.facebook!!) Color.GREEN else Color.RED)
@@ -91,9 +64,6 @@ class ProfileFragment : Fragment(R.layout.fragment_profile),
             binding?.slack?.setTextColor(if (it.connections?.slack!!) Color.GREEN else Color.RED)
             binding?.apple?.setTextColor(if (it.connections?.apple!!) Color.GREEN else Color.RED)
 
-            binding?.someStat2?.text = "Watched: " + it.sharingText?.watched
-            binding?.someStat3?.text = "Rated: " + it.sharingText?.rated
-
             swipeLayout.isRefreshing = false
         }.launchIn(lifecycleScope)
     }
@@ -101,37 +71,6 @@ class ProfileFragment : Fragment(R.layout.fragment_profile),
     override fun onDestroyView() {
         super.onDestroyView()
         binding = null
-    }
-
-    class ViewPagerAdapter(
-        fm: FragmentManager,
-        behavior: Int
-    ) : FragmentPagerAdapter(fm, behavior) {
-
-        override fun getItem(position: Int): Fragment {
-            return when (position) {
-                0 -> FavoriteInProfileFragment()
-                else -> InfoInProfileFragment()
-            }
-        }
-
-        override fun getPageTitle(position: Int): CharSequence {
-            return when (position) {
-                0 -> "FAVORITE"
-                else -> "INFO"
-            }
-        }
-
-        override fun getCount(): Int {
-            return INFO_TITLES.size
-        }
-    }
-
-    companion object {
-        private val INFO_TITLES = arrayOf(
-            R.layout.fragment_favorite_in_profile,
-            R.layout.fragment_info_in_profile
-        )
     }
 
     override fun onRefresh() {
