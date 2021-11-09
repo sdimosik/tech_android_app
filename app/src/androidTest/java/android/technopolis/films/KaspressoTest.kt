@@ -1,6 +1,6 @@
 package android.technopolis.films
 
-import android.technopolis.films.screen.MainScreen
+import android.technopolis.films.screen.FeedPage
 import android.technopolis.films.screen.WatchPage
 import android.technopolis.films.ui.base.MainActivity
 import androidx.test.rule.ActivityTestRule
@@ -22,7 +22,7 @@ class KaspressoTest : TestCase() {
             activityTestRule.finishActivity()
         }.run {
             step("Go to Watch Page") {
-                MainScreen.watchButton {
+                FeedPage.watchButton {
                     isVisible()
                     click()
                 }
@@ -30,7 +30,7 @@ class KaspressoTest : TestCase() {
 
             step("Check empty list note") {
                 WatchPage {
-                    text {
+                    films {
                         isVisible()
                     }
                 }
